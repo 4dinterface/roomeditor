@@ -1,4 +1,4 @@
-﻿class DoorBlock extends THREE.Object3D{
+class WindowBlock extends THREE.Object3D{
     constructor(x,y,horizontal) {
         super();
 

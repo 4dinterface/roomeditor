@@ -235,44 +235,51 @@ function init() {
     var light = new THREE.DirectionalLight( 0xffffff, 1 );
     light.position.set( 1, 1, 1 ).normalize();
     scene.add( light );
+    
+    //свет
+    var light1 = new THREE.DirectionalLight( 0x666666, 1 );
+    light1.position.set( -1, 1, -1 ).normalize();
+    scene.add( light1 );
         
     
     //========== wall ============//
-    var walls = new Walls(scene);
-    var wall = new Wall(10,0,false);
+    var walls = new Walls(scene, camera);
+    
+    var camera2 = camera;
+    var wall = new Wall(10,0,false, camera2);
     walls.add(wall);
 
-    var wall1 = new Wall(-2, 2,true);
+    var wall1 = new Wall(-2, 4,true, camera2);
     walls.add(wall1);
-    var door = new DoorBlock(0, 2,true);
+    var door = new DoorBlock(0, 4,true, camera2);
     walls.add(door);
-    var wall2 = new Wall(2, 2,true);
+    var wall2 = new Wall(2, 4,true, camera2);
     walls.add(wall2);
 
     //свяжем три элемента в единое целое
     walls.joint(wall1, door, wall2);
 
-    var wall = new Wall(-5,0,false);
+    var wall = new Wall(-10,0,false, camera2);
     walls.add(wall);
 
-    var wall = new Wall(0,-10,true);
+    var wall = new Wall(0,-10,true, camera2);
     walls.add(wall);        
-    var wall = new Wall(0,-15, false);
+    var wall = new Wall(0,-15, false, camera2);
     walls.add(wall);    
-    var wall = new Wall(0,-4, true);
+    var wall = new Wall(0,-4, true, camera2);
     walls.add(wall);
 
     //========== wall ============//
 
-    walls.mark();
+    //walls.mark();
     
     editor = new Editor(scene, camera, walls);
     //editor.orbitControls.addEventListener( 'change', ()=>console.log("render") );
 
     //raycaster
     raycaster = new THREE.Raycaster();
-    renderer = new THREE.WebGLRenderer();
-    renderer.setClearColor( 0xf0f0f0 );
+    renderer = new THREE.WebGLRenderer({antialias: true });
+    renderer.setClearColor( 0xf0f0f0 );    
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.sortObjects = false;

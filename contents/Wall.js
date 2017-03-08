@@ -1,16 +1,16 @@
 class Wall extends THREE.Object3D{
-    constructor(x,y,horizontal) {
+    constructor(x, y, horizontal, camera) {
         super();
 
-        //конфиг обьекта
-        this.height = 2.5;            // высота
-        this.thickness =0.5;          // толщина
-        this.isWallBlock = true;      // флаг указывающий что речь о блоке
-        this.horizontal = horizontal; // ориентация блока
+        //РєРѕРЅС„РёРі РѕР±СЊРµРєС‚Р°
+        this.height = 2.5;            // РІС‹СЃРѕС‚Р°
+        this.thickness =0.5;          // С‚РѕР»С‰РёРЅР°
+        this.isWallBlock = true;      // С„Р»Р°Рі СѓРєР°Р·С‹РІР°СЋС‰РёР№ С‡С‚Рѕ СЂРµС‡СЊ Рѕ Р±Р»РѕРєРµ
+        this.horizontal = horizontal; // РѕСЂРёРµРЅС‚Р°С†РёСЏ Р±Р»РѕРєР°
         this.rootGraph = null;
         this.joints=[];
 
-        //позиция
+        //РїРѕР·РёС†РёСЏ
         this.position.x = x;
         this.position.y = this.height/2;
         this.position.z = y;
@@ -18,12 +18,11 @@ class Wall extends THREE.Object3D{
         this.applyRotate();
 
         this.generateGeometry();
-        if(this.horizontal) {
-            this.generateHelpers();
+        if(this.horizontal) {            
+            this.generateHelpers(camera);
         }
 
         //====================================================//
-
     }
 
     generateGeometry(){
@@ -33,8 +32,10 @@ class Wall extends THREE.Object3D{
         this.add(this.wallMesh);
     }
 
-    generateHelpers(){
-        this.rule = new Rule();
+    generateHelpers(camera){
+        console.log("cam=", camera);
+        
+        this.rule = new Rule(camera);
         this.rule.position.y=this.height;
         this.rule.position.z=0;
         this.add(this.rule);
