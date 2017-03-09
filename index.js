@@ -251,7 +251,7 @@ function init() {
 
     var wall1 = new Wall(-2, 4,true, camera2);
     walls.add(wall1);
-    var door = new DoorBlock(0, 4,true, camera2);
+    var door = new WindowBlock(0, 4,true, camera2);
     walls.add(door);
     var wall2 = new Wall(2, 4,true, camera2);
     walls.add(wall2);

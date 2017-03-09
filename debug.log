@@ -2,3 +2,6 @@
 [0308/105931.298:ERROR:registration_protocol_win.cc(84)] TransactNamedPipe: Канал был закрыт. (0x6D)
 [0308/105931.300:ERROR:crash_report_database_win.cc(563)] CreateDirectory C:\Program Files (x86)\reports: Отказано в доступе. (0x5)
 [0308/105931.363:ERROR:crashpad_client_win.cc(660)] crash server failed to launch, no dump captured
+[0308/224522:ERROR:file_io_win.cc(163)] CreateFile C:\Program Files (x86)\settings.dat: Отказано в доступе. (0x5)
+[0308/224522:ERROR:registration_protocol_win.cc(82)] TransactNamedPipe: Канал был закрыт. (0x6D)
+[0308/224522:ERROR:file_io_win.cc(163)] CreateFile C:\Program Files (x86)\settings.dat: Отказано в доступе. (0x5)

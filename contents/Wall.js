@@ -18,9 +18,9 @@ class Wall extends THREE.Object3D{
         this.applyRotate();
 
         this.generateGeometry();
-        if(this.horizontal) {            
-            this.generateHelpers(camera);
-        }
+        //if(this.horizontal) {
+        this.generateHelpers(camera);
+        //}
 
         //====================================================//
     }

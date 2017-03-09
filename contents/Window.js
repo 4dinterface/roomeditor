@@ -19,19 +19,46 @@ class WindowBlock extends THREE.Object3D{
         if(!this.horizontal)
             this.rotation.y=Math.PI/2;
 
-        this.generateGeometry();
+        this.generateMesh();
     }
-
-    generateGeometry(){
-        var geometry = new THREE.BoxBufferGeometry( 1, 2, 1 );
+    generateMesh(){
+        var geometry = this.generateGeometry();
         this.wallMesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color:  0xffff66 } ) );
         this.wallMesh.isWallBlockComponent = true;
         this.add(this.wallMesh);
     }
 
+    generateGeometry(){
+        var length = 2,  //длинна
+            width = 2.5, //высота
+            offset=0.4;  //отступ рамы
+
+        var shape = new THREE.Shape();
+        shape.moveTo( -length/2, -width/2  );
+        shape.lineTo( -length/2, width/2 );
+        shape.lineTo( length/2, width/2 );
+        shape.lineTo( length/2, -width/2 );
+
+        shape.lineTo( length/2-offset, -width/2+offset );
+        shape.lineTo( length/2-offset, width/2-offset);
+        shape.lineTo( -length/2+offset, width/2-offset );
+        shape.lineTo( -length/2+offset, -width/2 + offset  );
+
+        var extrudeSettings = {
+            steps: 2,
+            amount: 0.5, //толщина стены
+            bevelEnabled: false,
+            bevelThickness: 1,
+            bevelSize: 1,
+            bevelSegments: 1
+        };
+
+        return new THREE.ExtrudeGeometry( shape, extrudeSettings );
+    }
+
 
     set size(value){
-        this.wallMesh.geometry = new THREE.BoxBufferGeometry( value, this.height, this.thickness );
+        this.wallMesh.geometry = this.generateGeometry();//new THREE.BoxBufferGeometry( value, this.height, this.thickness );
         this.wallMesh.geometry.needsUpdate = true;
         //this.rule.size = value;
         this._size=value;
