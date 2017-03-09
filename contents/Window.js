@@ -18,7 +18,7 @@ class WindowBlock extends THREE.Object3D{
 
         if(!this.horizontal)
             this.rotation.y=Math.PI/2;
-
+        
         this.generateGeometry();
     }
 

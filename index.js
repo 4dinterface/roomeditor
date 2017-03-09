@@ -183,7 +183,7 @@ class Editor{
                 e.object.position.z = e.position.z;
             }
         }
-
+        //console.log(this.camera.position);
 
         this.walls.translateWall(e.object, e.offset);
         //this.orbitControls.enabled = false;
@@ -225,9 +225,9 @@ function init() {
 
     //camera
     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-    camera.position.x = scene.position.x;
-    camera.position.y = 30;
-    camera.position.z = scene.position.z;
+    camera.position.x = scene.position.x-6;
+    camera.position.y = scene.position.y+9;
+    camera.position.z = scene.position.z+16;
     camera.lookAt( scene.position );
 
     

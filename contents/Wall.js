@@ -9,6 +9,7 @@ class Wall extends THREE.Object3D{
         this.horizontal = horizontal; // ориентация блока
         this.rootGraph = null;
         this.joints=[];
+        //this._size = 2;
 
         //позиция
         this.position.x = x;
@@ -17,7 +18,7 @@ class Wall extends THREE.Object3D{
 
         this.applyRotate();
 
-        this.generateGeometry();
+        this.generateMesh();
         if(this.horizontal) {            
             this.generateHelpers(camera);
         }
@@ -26,10 +27,30 @@ class Wall extends THREE.Object3D{
     }
 
     generateGeometry(){
-        var geometry = new THREE.BoxBufferGeometry( 1, 2, 1 );
+        return new THREE.BoxBufferGeometry( Math.abs(this.size), this.height||0.5, this.thickness||0.5 );
+    }
+    generateGeometry2(){
+        return new THREE.BoxBufferGeometry( this.thickness, this.height, this.thickness);
+    }
+    
+    generateMesh(){
+        var geometry = this.generateGeometry();
         this.wallMesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color:  0x999999 } ) );
         this.wallMesh.isWallBlockComponent = true;
         this.add(this.wallMesh);
+        
+        if(this.horizontal){
+            var geometry = this.generateGeometry2();
+            this.box = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color:  0x555555 } ) );
+            this.box.isWallBlockComponent = true;
+            this.add(this.box);    
+            
+            var geometry = this.generateGeometry2();
+            this.box2 = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color:  0x555555 } ) );
+            this.box2.isWallBlockComponent = true;
+            this.add(this.box2);    
+        }        
+        return geometry;
     }
 
     generateHelpers(camera){
@@ -42,13 +63,24 @@ class Wall extends THREE.Object3D{
     }
 
     set size(value){
+        this._size=value;
+        
         //value=Math.abs(value);
-        this.wallMesh.geometry = new THREE.BoxBufferGeometry( value, this.height, this.thickness );
+        this.wallMesh.geometry = this.generateGeometry();
         this.wallMesh.geometry.needsUpdate = true;
+        
+        if(this.horizontal){
+            this.box.geometry=this.generateGeometry2();
+            this.box.position.x = this.size>0?this.size/2+this.thickness/2:this.size/2-this.thickness/2;;
+            
+            this.box2.geometry==this.generateGeometry2();
+            this.box2.position.x = this.size>0?-this.size/2-this.thickness/2:-this.size/2+this.thickness/2;
+        }
+        
         if(this.rule)
             this.rule.size = value;
 
-        this._size=value;
+        
         this.applyRotate();
     }
 
