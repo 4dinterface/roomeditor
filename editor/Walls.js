@@ -10,15 +10,15 @@ class Walls  {
         this.items.push(item);
         this.scene.add( item );
         item.scene = this.scene;
-
+               
         //todo вероятно вынесем reacalc
         if(this.items.length>3)
             this.recalc();
-
         
         item.rootGraph = this;
     }
 
+    //ВНИМАНИЕ Я МОГУ ОПРЕДЕЛЯТЬ КАКОЙ ЭЛЕМЕНТ ИДЁТ ВПЕРЁД ПО КООРДИНАТАМ, ЭТО ИЗБАВИТ ОТ НЕОБХОДИМОСТИ ИСПОЛЬЗОВАТЬ ОТРИЦАТЕЛЬНЫЙ РАЗМЕР
     recalc() {
         for (var i = 1; i < this.items.length - 1; i++) {
             if (this.items[i].horizontal) {
@@ -47,36 +47,114 @@ class Walls  {
         }*/
     }
 
+    //x и размер вычисляется
+    //y задаёт пользователь
+    recalcWallHorizontal2(prev, current, next){
+        if(current.isBlock){
+            current.size = current.size * ((prev.size<0 && prev.horizontal && current.size>0) ? -1 : 1);
+            current.size = current.size * ((prev.size>0 && prev.horizontal && current.size<0) ? -1 : 1);
+            //console.log(current.size);
+        } else {
+            var xs=0,xe=0
+
+            if(prev.isBlock){
+                xs=prev.position.x+prev.size/2;
+            }else{
+                xs=(this.size>0)?prev.position.x+prev.thickness/2:prev.position.x+prev.thickness/2;
+            }
+
+            if(next.isBlock){
+                xe=next.position.x-next.size/2;
+            }else{
+                xe=(this.size>0)?next.position.x-next.thickness/2:next.position.x+next.thickness/2;
+            }
+
+            this.setHWall(current,xs,xe);
+            this.recalcBox(prev,current,next);
+        }
+    }
+
+    setHWall(wall, xs, xe){
+        wall.position.x=xs+((xe-xs)/2);
+        wall.size = (xe-xs);
+    }
 
 
     //x и размер вычисляется
     //y задаёт пользователь
-    recalcWallHorizontal(prev,current,next){
-        if(current.isBlock){
-            current.size = 2;
+    recalcWallHorizontal(prev, current, next){
+        if(current.isBlock){            
+            current.size = current.size * ((prev.size<0 && prev.horizontal && current.size>0) ? -1 : 1);
+            current.size = current.size * ((prev.size>0 && prev.horizontal && current.size<0) ? -1 : 1);            
+            //console.log(current.size);
         } else {
             var startPos = (prev.isBlock)? prev.position.x + prev.size/2 : prev.position.x;
             var endPos = (next.isBlock)? next.position.x - next.size/2 : next.position.x;
+            var size =endPos-startPos;
+            
+            var offsetX =0;
+            if(!prev.isBlock){
+                size = size>0? (size -prev.thickness/2):(size+prev.thickness/2);                
+                offsetX=size>0?prev.thickness/2:-prev.thickness/2;
+            }            
+            if(!next.isBlock){
+                size = size>0? (size - next.thickness/2):(size+next.thickness/2);
+            }
 
-            current.size = endPos- startPos;
-            var centerX = startPos + current.size/2;
-            current.position.x = centerX;
+
+            current.position.x = startPos + size/2+offsetX;
+            current.size=size;
+
+            //console.log(prev, next, prev.isBlock, next.isBlock);
+            this.recalcBox(prev,current,next);
         }
-
-        /*current.forward = this.getForward( current.position );
-        if(current.forward)
-            current.mark();
-        else
-            current.unmark();*/
     }
+
+
 
     recalcWallVertical(prev,current,next){
         var size = next.position.z - prev.position.z;
         var centerZ = prev.position.z + size/2;
         current.position.z = centerZ;
-        current.size = size;
+        current.size = size>0? (size -prev.thickness/2-next.thickness/2):(size+prev.thickness/2 + next.thickness/2);;
     }
 
+    //TODO это просто днище! Определится с кучей поворотов box
+    recalcBox(prev, current, next){
+        var leftBox = next,
+            rightBox = prev;
+
+        if(prev.position.x < current.position.x) {
+            leftBox = prev;
+            rightBox = next;
+        }
+
+        current.setEnableLeftBox(!leftBox.isBlock);
+        current.setEnableRightBox(!rightBox.isBlock);
+    }
+    
+    //проверка на пересечение стен
+    validateCross(wall, offset){        
+        /*var index = this.items.indexOf(wall);        
+        var prev =  this.items[index>0?index-1:this.items.length-1];
+        var next =  this.items[index<this.items.length-1?index+1:0];
+        
+        //console.log( Math.abs(prev.size));
+        return (Math.abs(prev.size)>1 && Math.abs(next.size)>1);*/
+        return true;
+    }
+    
+    validateTranslate(block, offset){
+        var index = this.items.indexOf(block);        
+        var prev =  this.items[index>0?index-1:this.items.length-1];
+        var next =  this.items[index<this.items.length-1?index+1:0];
+        
+        if( (prev.position.x-block.position.x)>0){
+            [prev, next] = [next, prev];            
+        }    
+        
+        return (Math.abs(prev.size)>0.5) && offset.x<0 || offset.x>0 && (Math.abs(next.size)>0.5);
+    }    
 
     translateWall(block, offset){
         if(!block.isBlock ) {
@@ -85,22 +163,31 @@ class Walls  {
             else
                 offset.z = 0;
 
-            if(block.joints.length==0)
-                block.position.add(offset);
-            //console.log("translate ", wall);
-
-            for(var item of block.joints){
-                item.position.add(offset);
+            if(this.validateCross(block, offset)){                    
+                if(block.joints.length==0)
+                    block.position.add(offset);            
+                for(var item of block.joints){
+                    item.position.add(offset);
+                }            
             }
-        } else{
-            if(!block.blockDetach){
+            
+        } else{            
+            if(!block.blockDetach){         
                 if (block.horizontal)
                     offset.z = 0;
                 else
-                    offset.x = 0;
+                    offset.x = 0;             
             }
-            block.position.add(offset);
-        }
+            
+            if(block.isBlock && !block.blockDetach){             
+                if(this.validateTranslate(block, offset)){
+                    block.position.add(offset);
+                }
+            } else {                                
+                block.position.add(offset);                
+            }     
+        } 
+        
         this.recalc();
     }
 
@@ -157,6 +244,10 @@ class Walls  {
         this.recalc();
     }
 
+    /*insertBlock(wall){
+
+    }*/
+
     joint(...args){
         for(var item of args){
             item.joints=args;
@@ -164,30 +255,7 @@ class Walls  {
     }
 
 
-    //TODO заменить более дешёвой операцией без raycast
-    getForward(pos) {
-        var v1=0, v2=0;
-
-        for(var item of this.items){
-            if(item.position === pos || !item.isWallBlock)
-                continue;
-
-            if(!item.horizontal)
-                continue;
-
-
-            //if(pos.x < (item.position.x + item.size / 2)){
-            if((pos.x > (item.position.x - item.size / 2)) && (pos.x < (item.position.x + item.size / 2))){
-                if(pos.z > item.position.z)
-                    v1++;
-                else
-                    v2++;
-            }
-        }
-        console.log("=>", v1, v2);
-        return (v1==0 && v2==0);
-    }
-
+    
 
     mark(){
         console.log("mark");
@@ -210,7 +278,7 @@ class Walls  {
         mesh.position.x = x;
         mesh.position.z = z;
         mesh.position.y = y;
-        this.scene.add( mesh );
+        this.scene.add( mesh );        
     }
-
+    
 }

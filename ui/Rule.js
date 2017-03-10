@@ -75,7 +75,7 @@ class Rule extends THREE.Object3D{
             this.line1.position.x = value/2;
             this.line2.position.x = -value/2;
             this._size=value;            
-            var val = Math.abs(value).toString().substr(0,4);
+            var val = value;//Math.abs(value).toString().substr(0,4);
             this.updateRenderText(val);
         }
     }

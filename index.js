@@ -183,7 +183,7 @@ class Editor{
                 e.object.position.z = e.position.z;
             }
         }
-
+        //console.log(this.camera.position);
 
         this.walls.translateWall(e.object, e.offset);
         //this.orbitControls.enabled = false;
@@ -225,11 +225,10 @@ function init() {
 
     //camera
     camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-    camera.position.x = scene.position.x;
-    camera.position.y = 30;
-    camera.position.z = scene.position.z;
+    camera.position.x = scene.position.x-6;
+    camera.position.y = scene.position.y+9;
+    camera.position.z = scene.position.z+16;
     camera.lookAt( scene.position );
-
     
     //свет
     var light = new THREE.DirectionalLight( 0xffffff, 1 );
@@ -249,15 +248,25 @@ function init() {
     var wall = new Wall(10,0,false, camera2);
     walls.add(wall);
 
-    var wall1 = new Wall(-2, 4,true, camera2);
+    //=========================================//
+    var wall1 = new Wall(2, 4,true, camera);
     walls.add(wall1);
-    var door = new WindowBlock(0, 4,true, camera2);
+
+    /*var door = new DoorBlock(0, 4,true, camera);
     walls.add(door);
-    var wall2 = new Wall(2, 4,true, camera2);
+
+    var wall2 = new Wall(-2, 4,true, camera);
     walls.add(wall2);
 
-    //свяжем три элемента в единое целое
-    walls.joint(wall1, door, wall2);
+    var win = new WindowBlock(-4, 4,true, camera);
+    walls.add(win);
+
+    var wall3 = new Wall(-9, 4, true, camera);
+    walls.add(wall3);
+
+    walls.joint(wall1, door, wall2, win, wall3);*/
+   //=========================================//
+
 
     var wall = new Wall(-10,0,false, camera2);
     walls.add(wall);
@@ -270,7 +279,17 @@ function init() {
     walls.add(wall);
 
     //========== wall ============//
+    //walls.recalc();
 
+    var door = new DoorBlock(-4, 4,true, camera);
+    scene.add(door);
+    walls.attachBlock(wall1,door);
+
+    var win = new WindowBlock(4, 4,true, camera);
+    scene.add(win);
+    walls.attachBlock(wall1, win);
+
+    walls.recalc();
     //walls.mark();
     
     editor = new Editor(scene, camera, walls);
