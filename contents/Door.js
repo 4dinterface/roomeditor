@@ -41,6 +41,8 @@ class DoorBlock extends THREE.Object3D{
         this.wallMesh.geometry.needsUpdate = true;
         //this.rule.size = value;
         this._size=value;
+        if(!this.horizontal)
+            this.rotation.y=Math.PI/2;
     }
 
     get size(){

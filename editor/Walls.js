@@ -180,7 +180,10 @@ class Walls  {
             var newWall = new Wall(wall.position.x + size / 2, wall.position.z, true);
             wall.position.x= wall.position.x - size / 2;
         } else {
-            return;
+            block.horizontal = false;
+            block.position.x = wall.position.x;
+            var newWall = new Wall(wall.position.x, wall.position.z+ size / 2, false);
+            wall.position.z= wall.position.z - size / 2;      
         }
 
         //обновим итемсы
