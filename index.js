@@ -94,8 +94,7 @@ class Dragable extends EventDispatcher{
     wallRaycaster(){
         raycaster.setFromCamera( mouse, camera ); //TODO мышь и камера не должны быть глабальными
         var _objects = scene.children.filter(_=> !_.isHelper );//TODO ФИЛЬТРАЦИЯ ЗЛО, ЛУЧШЕ ЗАВЕСТИ ОБЬЕКТЫ РОДИТЕЛИ ДЛЯ ГРУПП
-        _objects=_objects.map(_=>_.isWallBlock  ? _.wallMesh : _);
-        return raycaster.intersectObjects( _objects );
+        return raycaster.intersectObjects( _objects, true);
     }
 
     update(){
@@ -103,12 +102,15 @@ class Dragable extends EventDispatcher{
         var camera = this.camera;
         var INTERSECTED = this.intersected;
 
-        var intersects = this. wallRaycaster()
+        var intersects = this. wallRaycaster();
+
 
         //console.log(intersects.length, _objects.length);
         
-        if (intersects.length>0 && intersects[0].object.isWallBlockComponent) {                        
+        if (intersects.length>0 && (intersects[0].object.isWallBlockComponent || intersects[0].object.isFurnitureComponent )) {
             if (INTERSECTED != intersects[0].object) {
+                console.log(intersects[0].object.root);
+
                 if(INTERSECTED){
                     INTERSECTED.onHighlightOff();
                 }
@@ -150,20 +152,40 @@ class Editor{
         this.dragable.addEventListener("dragstart", this.onDragStart  );
         this.dragable.addEventListener("dragend", this.onDragEnd);
         
-        
         //grid
         this.gridHelper = new THREE.GridHelper( 100, 100  );
         this.gridHelper.isHelper = true;
         scene.add( this.gridHelper );
+
+        this.selects = [];
     }
     
     update(){
         this.dragable.update();
     }
+
+    setSelect(select) {
+        this.selects.forEach(select => select.unselect() );
+        this.selects=[];
+        this.addSelect(select);
+    }
+
+    addSelect(object){
+        this.selects.push(object);
+        object.select();
+    }
+
+    isSelected(object) {
+        return this.selects.indexOf(object) >- 1;
+    }
     
     onDragStart(e){
         this.orbitControls.enabled = false;
+        if(e.object.isFurniture && !this.isSelected(e.object)){
+            this.setSelect(e.object);
+        }
         this.attachBlockPos = e.position;
+
     } 
     
     onDragEnd(){
@@ -171,6 +193,16 @@ class Editor{
     }     
     
     onDrag(e){
+        this.orbitControls.enabled = false;
+
+        if(e.object.isFurniture){
+            this.dragFurniture(e);
+        } else {
+            this.dragWall(e);
+        }
+    }
+
+    dragWall(e){
         if(e.object.blockDetach && e.backSelect){
             this.walls.attachBlock(e.backSelect, e.object);
             this.attachBlockPos= e.position;
@@ -183,12 +215,14 @@ class Editor{
                 e.object.position.z = e.position.z;
             }
         }
-        //console.log(this.camera.position);
-
         this.walls.translateWall(e.object, e.offset);
-        //this.orbitControls.enabled = false;
-    }       
-        
+    }
+
+    dragFurniture(e){
+        e.object.position.x= e.position.x;
+        e.object.position.z= e.position.z;
+        SelectorManager.update();
+    }
 }
 
 
@@ -252,19 +286,6 @@ function init() {
     var wall1 = new Wall(2, 4,true, camera);
     walls.add(wall1);
 
-    /*var door = new DoorBlock(0, 4,true, camera);
-    walls.add(door);
-
-    var wall2 = new Wall(-2, 4,true, camera);
-    walls.add(wall2);
-
-    var win = new WindowBlock(-4, 4,true, camera);
-    walls.add(win);
-
-    var wall3 = new Wall(-9, 4, true, camera);
-    walls.add(wall3);
-
-    walls.joint(wall1, door, wall2, win, wall3);*/
    //=========================================//
 
 
@@ -289,8 +310,20 @@ function init() {
     scene.add(win);
     walls.attachBlock(wall1, win);
 
+    //scene
+    SelectorManager.scene = scene;
+
+    var loader = new ModelLoader("3dcontent");
+    loader.load("Toilet",(obj)=>{
+        scene.add(obj);
+        console.log("загружен", obj);
+    });
+
     walls.recalc();
     //walls.mark();
+
+    //==========================================================//
+
     
     editor = new Editor(scene, camera, walls);
     //editor.orbitControls.addEventListener( 'change', ()=>console.log("render") );
