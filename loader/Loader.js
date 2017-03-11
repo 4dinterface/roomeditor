@@ -1,4 +1,5 @@
 class ModelLoader{
+
     constructor(path){
         this.path = path;
         this.activeLoadCount = 0;
@@ -9,11 +10,10 @@ class ModelLoader{
     }
 
     onError(){
-        this.activeLoadCount-- //вероятно нужно уменьшать счётчик в случае загрузки (протестить)
+        this.activeLoadCount--; //вероятно нужно уменьшать счётчик в случае загрузки (протестить)
     }
 
     load(name,fn){
-
         this.loadObj(name,(obj)=>{
             //TODO добавить кеширование
             this.applyConfig(obj);

@@ -21,7 +21,7 @@ class DoorBlock extends THREE.Object3D{
             this.rotation.y=Math.PI/2;
 
         this.generateMesh();
-        this.size = 2;
+        this.size = 1.2;
     }
 
     generateMesh(){
