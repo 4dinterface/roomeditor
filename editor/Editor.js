@@ -51,7 +51,14 @@ class Editor{
 
         this.orbitControls.enabled = false;
         if(e.isHTMLDrag) {
-            console.log("htmldrag");
+            var loader = new ModelLoader("3dcontent");
+            loader.load("Toilet",(obj)=>{
+                this.scene.add(obj);
+                this.dragable.setSelectObject(obj);
+                console.log("загружен", obj);
+            });
+
+
         } else if(e.object.isFurniture && !this.isSelected(e.object)){
             this.setSelect(e.object);
         } else if(e.object.isUI){

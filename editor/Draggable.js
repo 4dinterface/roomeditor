@@ -125,6 +125,11 @@ class Dragable extends EventDispatcher{
         return raycaster.intersectObjects( _objects, true);
     }
 
+    setSelectObject(obj){
+        this.selectObject = obj;
+        this.isHTMLDrag = false;
+    }
+
     update(){
         var scene= this.scene;
         var camera = this.camera.currentCamera;
