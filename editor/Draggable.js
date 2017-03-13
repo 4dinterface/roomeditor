@@ -1,8 +1,10 @@
 class Dragable extends EventDispatcher{
-    constructor(scene, camera){
+    constructor(scene){
         super();
         this.scene = scene;
-        this.camera = camera;
+        this.camera = IoC.inject(MainCamera);//TODO переименовать camera в mainCamera
+
+        //this.camera.currentCamera  = camera;
         this.intersected = null;
         this.start = new THREE.Vector3();
         this.offset = new THREE.Vector3();
@@ -18,13 +20,35 @@ class Dragable extends EventDispatcher{
         this.plane.visible = false;
         this.plane.isHelper = true;
         this.scene.add( this.plane );
+
+        //document.addEventListener("mousemove", this.onMouseMove);
     }
 
-    onMouseDown(){
-        if(this.intersected){
+    onMouseDown(e){
+        var HTMLElement = document.elementFromPoint(e.screenX, e.screenY);
+        console.log(HTMLElement);
+        console.log(HTMLElement.tagName);
+
+        this.isHTMLDrag =false;
+        this.isDraggable = false;
+
+        //если выделили какой-то элемент
+        if(HTMLElement.tagName === "EDITOR-CATALOG") {
+            this.offset = new THREE.Vector3();
+            this.isDraggable = false;
+            this.startPos = this.getMousePoseOnPlane();
+            this.oldMousePos = this.startPos;
+            this.isHTMLDrag =true;
+            this.HTMLElement = HTMLElement;
+
+            document.addEventListener("mousemove", this.onMouseMove);
+            console.log("начали перетаскивание");
+        }
+
+        //иначе провер€ем клик по экрану
+        else if(this.intersected){
             this.offset = new THREE.Vector3();
             this.selectObject = this.intersected;
-            this.isDraggable = false;
             this.startPos = this.getMousePoseOnPlane();
             this.oldMousePos = this.startPos;
 
@@ -33,23 +57,24 @@ class Dragable extends EventDispatcher{
     }
 
     onMouseUp(){
-        if(this.selectObject)
+        if(this.isDraggable)
             document.removeEventListener("mousemove", this.onMouseMove);
 
         this.dispatchEvent({
             type:"dragend",
             object: this.selectObject
         })
+
         this.selectObject = null;
         this.isDraggable = false;
-
+        this.isHTMLDrag =false;
     }
 
     onMouseMove(){
         var mousePos = this.getMousePoseOnPlane();
         this.offset.copy(mousePos).sub(this.oldMousePos);
         this.oldMousePos = mousePos;
-        var startOffset = new THREE.Vector3();
+        var startOffset = new THREE.Vector3(0,0,0);
         startOffset.copy(this.startPos);
         startOffset.sub(mousePos)
 
@@ -62,7 +87,10 @@ class Dragable extends EventDispatcher{
                 object: this.selectObject,
                 startPos: startOffset,
                 backSelect: this.backSelect,
-                position: mousePos
+                position: mousePos,
+
+                isHTMLDrag:this.isHTMLDrag,
+                HTMLElement: this.HTMLElement
             })
             this.isDraggable = true;
         } else {
@@ -72,7 +100,10 @@ class Dragable extends EventDispatcher{
                 startOffset: startOffset,
                 object: this.selectObject,
                 backSelect:this.backSelect,
-                position: mousePos
+                position: mousePos,
+
+                isHTMLDrag:this.isHTMLDrag,
+                HTMLElement: this.HTMLElement
             })
         }
     }
@@ -80,22 +111,24 @@ class Dragable extends EventDispatcher{
     getMousePoseOnPlane(){
         var point = new THREE.Vector3();
         this.plane.visible = true;
-        raycaster.setFromCamera( mouse, camera );
+        raycaster.setFromCamera( mouse, this.camera.currentCamera );
         var intersects = raycaster.intersectObject(this.plane);
         point.copy(intersects[0].point).sub(this.plane.position);
+
         this.plane.visible = false;
         return point;
     }
 
     wallRaycaster(){
-        raycaster.setFromCamera( mouse, camera ); //TODO мышь и камера не должны быть глабальными
+        raycaster.setFromCamera( mouse, this.camera.currentCamera ); //TODO мышь и камера не должны быть глабальными
         var _objects = scene.children.filter(_=> !_.isHelper );//TODO ‘»Ћ№“–ј÷»я «Ћќ, Ћ”„Ў≈ «ј¬≈—“» ќЅ№≈ “џ –ќƒ»“≈Ћ» ƒЋя √–”ѕѕ
         return raycaster.intersectObjects( _objects, true);
     }
 
     update(){
         var scene= this.scene;
-        var camera = this.camera;
+        var camera = this.camera.currentCamera;
+
         var INTERSECTED = this.intersected;
 
         var intersects = this. wallRaycaster();
@@ -122,4 +155,5 @@ class Dragable extends EventDispatcher{
         }
         this.intersected = INTERSECTED;
     }
+
 }

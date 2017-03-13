@@ -1,0 +1,79 @@
+<dom-module id="editor-catalog">
+
+    <template>
+        <style>
+            .tabs{
+                width:100%;
+                height:57px;
+                background:black;
+                display:flex;
+            }
+
+            .tab{
+                flex:1;
+                background-color: #DBDFE0;
+                border-right: 1px solid #96a2ad;
+                border-bottom: 1px solid #96a2ad;
+            }
+
+            .tab-selected{
+                background-color: #eff1f1;
+            }
+
+            .contentPanel{
+                display:flex;
+                flex-wrap:wrap;
+            }
+
+            .contentItem{
+                flex:1;
+                min-width: 110px;
+                height:110px;
+                border-right:1px solid #96a2ad;
+                border-bottom:1px solid #96a2ad;
+                background:#fafafa;
+            }
+
+        </style>
+
+
+        <div class="warning" style="position:absolute;top:0px;left:0px;width:240px; height:100%; background:#DBDFE0;">
+
+            <div class="tabs">
+                <div class="tab tab-selected"></div>
+                <div class="tab"></div>
+                <div class="tab"></div>
+                <div class="tab"></div>
+            </div>
+
+            <div class="contentPanel">
+                <div class="contentItem"></div>
+                <div class="contentItem"></div>
+                <div class="contentItem"></div>
+                <div class="contentItem"></div>
+                <div class="contentItem"></div>
+                <div class="contentItem"></div>
+            </div>
+
+        </div>
+    </template>
+
+</dom-module>
+
+<script>
+    class EditorCatalog extends Polymer.Element {
+        static get is() { return  'editor-catalog' }
+        ready() {
+            super.ready();
+            //this.$.name.textContent = this.tagName;
+        }
+
+        onDragStart(){
+            console.log("новый элемент");
+        }
+    }
+    customElements.define(EditorCatalog.is, EditorCatalog);
+</script>
+
+
+

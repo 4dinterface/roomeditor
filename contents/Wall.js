@@ -53,7 +53,7 @@ class Wall extends THREE.Object3D{
     }
 
     generateHelpers(camera){
-        console.log("cam=", camera);
+        //console.log("cam=", camera);
         
         this.rule = new Rule(camera);
         this.rule.position.y=this.height;

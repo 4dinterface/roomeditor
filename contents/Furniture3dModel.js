@@ -2,6 +2,7 @@ class Furniture3dModel extends THREE.Group{
     constructor(){
         super();
         this.isFurniture =true;
+        this.selectorManager = IoC.inject(SelectorManager);
     }
 
     onFinishLoad(){
@@ -12,11 +13,11 @@ class Furniture3dModel extends THREE.Group{
     }
 
     select(){
-        this.selector = SelectorManager.popSelector(this);
+        this.selector = this.selectorManager.popSelector(this);
     }
 
     unselect(){
-        SelectorManager.pushSelector(this.selector);
+        this.selectorManager.pushSelector(this.selector);
     }
 
     onHighlightOn(){
@@ -80,25 +81,26 @@ class FurnitureSelector extends THREE.Group {
 }
 
 
-class SelectorManager2{
+class SelectorManager extends THREE.Group{
     constructor(){
+        super();
         this.selectors=[];
     }
 
     popSelector(owner){
         var selector= new FurnitureSelector(owner);
-        this.scene.add( selector );
+        this.add( selector );
         selector.owner = owner;
         this.selectors=[selector];
         return selector;
     }
 
     pushSelector(selector){
-        this.scene.remove(selector);
+        this.remove(selector);
         this.selectors=[];
     }
 
-    update(){
+    updateSelectors(){
         this.selectors.forEach((selector)=>{
             var pos=selector.owner.position;
             selector.position.set(pos.x, pos.y,pos.z);
@@ -106,5 +108,8 @@ class SelectorManager2{
     }
 }
 
+SelectorManager.isSingleton = true;
+IoC.registerClass(SelectorManager);
+
 //TODO запилить DI Framework
-var SelectorManager=new SelectorManager2();
+//var SelectorManager=new SelectorManager2();

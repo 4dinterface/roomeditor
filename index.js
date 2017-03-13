@@ -3,133 +3,126 @@
 var container, stats;
 var camera, scene, raycaster, renderer;
 var mouse = new THREE.Vector2();
-var radius = 100, theta = 0;
 var dragable;
 var editor;
-
-init();
-animate();
-
-
 var walls;
 
 
-var controls;
 
-function init() {
-    "use strict";
-    container = document.createElement( 'div' );
-    document.body.appendChild( container );
-    scene = new THREE.Scene();
+//инициализация приложени
+class App {
+    constructor(){
+        this.init()
+        this.animate();
+    }
 
-    //camera
-    camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-    camera.position.x = scene.position.x-6;
-    camera.position.y = scene.position.y+9;
-    camera.position.z = scene.position.z+16;
-    camera.lookAt( scene.position );
-    
-    //свет
-    var light = new THREE.DirectionalLight( 0xffffff, 1 );
-    light.position.set( 1, 1, 1 ).normalize();
-    scene.add( light );
-    
-    //свет
-    var light1 = new THREE.DirectionalLight( 0x666666, 1 );
-    light1.position.set( -1, 1, -1 ).normalize();
-    scene.add( light1 );
-        
-    
-    //========== wall ============//
-    var walls = new Walls(scene, camera);
-    
-    var camera2 = camera;
-    var wall = new Wall(10,0,false, camera2);
-    walls.add(wall);
+    init() {
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+        scene = IoC.inject(AppScene, this);
 
-    //=========================================//
-    var wall1 = new Wall(2, 4,true, camera);
-    walls.add(wall1);
+        //camera
+        this.mainCamera = IoC.inject(MainCamera);
+        scene.add(this.mainCamera);
+        camera = this.mainCamera.currentCamera; //Выпилить очень срочно
 
-   //=========================================//
+        //свет
+        var light = new THREE.DirectionalLight( 0xffffff, 1 );
+        light.position.set( 1, 1, 1 ).normalize();
+        scene.add( light );
+
+        //свет
+        var light1 = new THREE.DirectionalLight( 0x666666, 1 );
+        light1.position.set( -1, 1, -1 ).normalize();
+        scene.add( light1 );
+
+        //========== wall ============//
+        var camera2 = this.mainCamera.currentCamera;
+        var walls = new Walls(scene, camera2);
 
 
-    var wall = new Wall(-10,0,false, camera2);
-    walls.add(wall);
+        var wall = new Wall(10,0,false, camera2);
+        walls.add(wall);
 
-    var wall = new Wall(0,-10,true, camera2);
-    walls.add(wall);        
-    var wall = new Wall(0,-15, false, camera2);
-    walls.add(wall);    
-    var wall = new Wall(0,-4, true, camera2);
-    walls.add(wall);
+        //=========================================//
+        var wall1 = new Wall(2, 4,true, camera2);
+        walls.add(wall1);
 
-    //========== wall ============//
-    //walls.recalc();
+        //=========================================//
+        var wall = new Wall(-10,0,false, camera2);
+        walls.add(wall);
 
-    var door = new DoorBlock(-4, 4,true, camera);
-    scene.add(door);
-    walls.attachBlock(wall1,door);
+        var wall = new Wall(0,-10,true, camera2);
+        walls.add(wall);
+        var wall = new Wall(0,-15, false, camera2);
+        walls.add(wall);
+        var wall = new Wall(0,-4, true, camera2);
+        walls.add(wall);
 
-    var win = new WindowBlock(4, 4,true, camera);
-    scene.add(win);
-    walls.attachBlock(wall1, win);
+        //========== wall ============//
+        //walls.recalc();
 
-    //scene
-    SelectorManager.scene = scene;
+        var door = new DoorBlock(-4, 4,true, camera2);
+        scene.add(door);
+        walls.attachBlock(wall1,door);
 
-    var loader = new ModelLoader("3dcontent");
-    loader.load("Toilet",(obj)=>{
-        scene.add(obj);
-        console.log("загружен", obj);
-    });
+        var win = new WindowBlock(4, 4,true, camera2);
+        scene.add(win);
+        walls.attachBlock(wall1, win);
 
-    walls.recalc();
-    //walls.mark();
+        //scene
+        var selectorManager = IoC.inject(SelectorManager);
+        scene.add(selectorManager);
 
-    //==========================================================//
+        var loader = new ModelLoader("3dcontent");
+        loader.load("Toilet",(obj)=>{
+            scene.add(obj);
+            console.log("загружен", obj);
+        });
 
-    
-    editor = new Editor(scene, camera, walls);
-    //editor.orbitControls.addEventListener( 'change', ()=>console.log("render") );
+        walls.recalc();
+        //walls.mark();
 
-    //raycaster
-    raycaster = new THREE.Raycaster();
-    renderer = new THREE.WebGLRenderer({antialias: true });
-    renderer.setClearColor( 0xf0f0f0 );    
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.sortObjects = false;
-    container.appendChild(renderer.domElement);
+        //==========================================================//
 
-    //stats = new Stats();
-    //container.appendChild( stats.dom );
+        editor = new Editor(scene, camera2, walls);
 
-    document.addEventListener( 'mousemove', onDocumentMouseMove, false);
-    window.addEventListener( 'resize', onWindowResize, false );
+        //raycaster
+        raycaster = new THREE.Raycaster();
+        renderer = new THREE.WebGLRenderer({antialias: true });
+        renderer.setClearColor( 0xf0f0f0 );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.sortObjects = false;
+        document.getElementById("main-panel").appendChild(renderer.domElement);
+
+        //stats = new Stats();
+        document.addEventListener( 'mousemove', this.onDocumentMouseMove.bind(this), false); //TODO выпилить нафик
+        window.addEventListener( 'resize', this.onWindowResize.bind(this), false );
+    }
+
+    onWindowResize() {
+        this.mainCamera.currentCamera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        this.mainCamera.currentCamera.setSize( window.innerWidth, window.innerHeight ); //ЗАПИЛИТЬ setSize прямо в mainCamera
+    }
+
+    onDocumentMouseMove( event ) {
+        event.preventDefault();
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    }
+
+    //
+    animate() {
+        requestAnimationFrame( this.animate.bind(this) );
+        this.render();
+    }
+
+    render() {
+        editor.update();
+        renderer.render( scene, this.mainCamera.currentCamera );
+    }
 }
 
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-}
-
-function onDocumentMouseMove( event ) {
-    event.preventDefault();
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-}
-
-//
-function animate() {
-    requestAnimationFrame( animate );
-    render();
-}
-
-//=================================================================================================================//
-//Onrender
-function render() {
-    editor.update();
-    renderer.render( scene, camera );
-}
+var app = new App();

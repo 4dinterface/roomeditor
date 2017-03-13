@@ -1,6 +1,6 @@
 class Editor{
-    constructor(scene, camera, walls){
 
+    constructor(scene, camera, walls){
         this.onDrag = this.onDrag.bind(this);
         this.onDragStart = this.onDragStart.bind(this);
         this.onDragEnd = this.onDragEnd.bind(this);
@@ -11,6 +11,7 @@ class Editor{
         this.walls =walls;
 
         this.orbitControls = new THREE.OrbitControls( this.camera );
+        this.selectorManager = IoC.inject(SelectorManager, this);
 
         //перетаскивание
         this.dragable = new Dragable(this.scene, this.camera);
@@ -46,11 +47,14 @@ class Editor{
     }
 
     onDragStart(e){
+        console.log("dragstart");
+
         this.orbitControls.enabled = false;
-        if(e.object.isFurniture && !this.isSelected(e.object)){
+        if(e.isHTMLDrag) {
+            console.log("htmldrag");
+        } else if(e.object.isFurniture && !this.isSelected(e.object)){
             this.setSelect(e.object);
-        }
-        if(e.object.isUI){
+        } else if(e.object.isUI){
             e.object.onDragStart(e);
         }
         this.attachBlockPos = e.position;
@@ -64,7 +68,9 @@ class Editor{
     onDrag(e){
         this.orbitControls.enabled = false;
 
-        if(e.object.isFurniture){
+        if(e.isHTMLDrag) {
+            console.log("htmldrag");
+        } else if(e.object.isFurniture){
             this.dragFurniture(e);
         }  else if(e.object.isUI) {
             e.object.onDrag(e);
@@ -93,6 +99,6 @@ class Editor{
     dragFurniture(e){
         e.object.position.x= e.position.x;
         e.object.position.z= e.position.z;
-        SelectorManager.update();
+        this.selectorManager.updateSelectors();
     }
 }

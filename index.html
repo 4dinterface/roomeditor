@@ -8,43 +8,57 @@
         canvas { width: 100%; height: 100% }
 
     </style>
+
+    <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="bower_components/polymer/polymer.html">
+    <link rel="import" href="leftpanel.html">
+
 </head>
-<body>
-<script src="vendors/EventDispatcher.js"></script>
-<script src="vendors/three.min.js"></script>
-<script src="vendors/OrbitControls.js"></script>
-<script src="vendors/Threex.DynamicTexture.js"></script>
+
+    <body>
+        <div style="display:flex;width:100%;height:100%;">
+            <editor-catalog style="width:240px"></editor-catalog>
+            <div style="flex:1;" id="main-panel"> </div>
+        </div>
+        <!-- ============================================================================================================== -->
+        <!--                                                   SCRUPTS                                                      2-->
+        <!-- ============================================================================================================== -->
 
 
+        <script src="vendors/EventDispatcher.js"></script>
+        <script src="vendors/three.min.js"></script>
+        <script src="vendors/OrbitControls.js"></script>
+        <script src="vendors/Threex.DynamicTexture.js"></script>
 
-<script src="ui/3dwidgets/Rule.js"></script>
+        <!-- ---------------- IOC------------------ -->
+        <script src="IoC/Container.js"></script>
 
-<!-- ---------------- CONTENTS ------------------ -->
-<script src="contents/Door.js"></script>
-<script src="contents/Window.js"></script>
-<script src="contents/Wall.js"></script>
-<script src="contents/Furniture3dModel.js"></script>
+        <!-- --------------- UIComponent ---------------- -->
+        <script src="ui/3dwidgets/Rule.js"></script>
 
-<!-- ---------------- EDITORS ------------------ -->
-<script src="editor/Walls.js"></script>
-<script src="editor/Draggable.js"></script>
-<script src="editor/Editor.js"></script>
+        <!-- ---------------- CONTENTS ------------------ -->
+        <script src="contents/Door.js"></script>
+        <script src="contents/Window.js"></script>
+        <script src="contents/Wall.js"></script>
+        <script src="contents/Furniture3dModel.js"></script>
 
-<!-- ----------------- LOADER ------------------ -->
+        <!-- ---------------- EDITORS ------------------ -->
+        <script src="editor/AppScene.js"></script>
+        <script src="editor/Walls.js"></script>
+        <script src="editor/Draggable.js"></script>
+        <script src="editor/Editor.js"></script>
+        <script src ="editor/MainCamera.js"></script>
 
-<script src="vendors/loaders/DDSLoader.js"></script>
-<script src="vendors/loaders/MTLLoader.js"></script>
-<script src="vendors/loaders/OBJLoader.js"></script>
-<script src="Loader/Loader.js"></script>
+        <!-- ----------------- LOADER ------------------ -->
 
-<!-- ------------------ APP -------------------- -->
-<script src="index.js"></script>
+        <script src="vendors/loaders/DDSLoader.js"></script>
+        <script src="vendors/loaders/MTLLoader.js"></script>
+        <script src="vendors/loaders/OBJLoader.js"></script>
+        <script src="Loader/Loader.js"></script>
 
-<img src ="./ui/2dwidgets/trashcan.png" style ="position:absolute; bottom:25px;right:25px;width:100px;"/>
+        <!-- ------------------ APP -------------------- -->
+        <script src="index.js"></script>
 
-
-<script>
-    // Our Javascript will go here.
-</script>
-</body>
+        <img src ="./ui/2dwidgets/trashcan.png" style ="position:absolute; bottom:25px;right:25px;width:100px;"/>
+    </body>
 </html>
