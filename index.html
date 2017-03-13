@@ -2,7 +2,8 @@
 <html>
 <head>
     <meta charset=utf-8>
-    <title>My first three.js app</title>
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <title>3DPlan</title>
     <style>
         html, body { margin: 0; overflow:hidden; }
         canvas { width: 100%; height: 100% }
@@ -21,7 +22,7 @@
             <div style="flex:1;" id="main-panel"> </div>
         </div>
         <!-- ============================================================================================================== -->
-        <!--                                                   SCRUPTS                                                      2-->
+        <!--                                                   SCRIPTS                                                      2-->
         <!-- ============================================================================================================== -->
 
 
@@ -43,6 +44,7 @@
         <script src="contents/Furniture3dModel.js"></script>
 
         <!-- ---------------- EDITORS ------------------ -->
+        <script src="editor/Graph.js"></script>
         <script src="editor/AppScene.js"></script>
         <script src="editor/Walls.js"></script>
         <script src="editor/Draggable.js"></script>
@@ -59,6 +61,6 @@
         <!-- ------------------ APP -------------------- -->
         <script src="index.js"></script>
 
-        <img src ="./ui/2dwidgets/trashcan.png" style ="position:absolute; bottom:25px;right:25px;width:100px;"/>
+        <editor-recycled></editor-recycled>        
     </body>
 </html>

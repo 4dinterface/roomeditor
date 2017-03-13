@@ -38,10 +38,11 @@ class App {
 
         //========== wall ============//
         var camera2 = this.mainCamera.currentCamera;
-        var walls = new Walls(scene, camera2);
+        
+        var walls = IoC.inject(Walls); //new Walls(scene, camera2);
 
 
-        var wall = new Wall(10,0,false, camera2);
+        /*var wall = new Wall(10,0,false, camera2);
         walls.add(wall);
 
         //=========================================//
@@ -63,10 +64,12 @@ class App {
         //walls.recalc();
 
         var door = new DoorBlock(-4, 4,true, camera2);
+        door.position.set(-4, door.position.y, 4);
         scene.add(door);
         walls.attachBlock(wall1,door);
 
         var win = new WindowBlock(4, 4,true, camera2);
+        win.position.set(4, win.position.y, 4);
         scene.add(win);
         walls.attachBlock(wall1, win);
 
@@ -74,14 +77,27 @@ class App {
         var selectorManager = IoC.inject(SelectorManager);
         scene.add(selectorManager);
 
-        var loader = new ModelLoader("3dcontent");
-        loader.load("Toilet",(obj)=>{
-            scene.add(obj);
-            console.log("загружен", obj);
-        });
+        
+        
+        var model = new Furniture3dModel();
+        scene.add(model);
 
         walls.recalc();
         //walls.mark();
+        */
+        
+        //==========================================================//
+        var graph = IoC.inject(Graph, this);
+        scene.add(graph);
+        
+        var wall1 = new Wall(0,0,false, camera2);
+        graph.add(wall1, null, 10,10);
+        
+        var wall2 = new Wall(0,0,false, camera2);
+        graph.add(wall2, wall1, 10, 20);
+        
+        var window2 = new WindowBlock(0, 0, true, camera2);
+        graph.add(window2, wall2, 10, 24);
 
         //==========================================================//
 

@@ -1,3 +1,21 @@
+<dom-module id="catalog-item">
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+    class CatalogContentItem extends Polymer.Element {
+        static get is() { return  'catalog-item' }
+        ready() {
+            super.ready();
+            this.addEventListener("mousedown",(e)=>{})            
+        }                
+    }
+    customElements.define(CatalogContentItem.is, CatalogContentItem);
+</script>
+
+        
 <dom-module id="editor-catalog">
 
     <template>
@@ -47,12 +65,29 @@
             </div>
 
             <div class="contentPanel">
-                <div class="contentItem"></div>
-                <div class="contentItem"></div>
-                <div class="contentItem"></div>
-                <div class="contentItem"></div>
-                <div class="contentItem"></div>
-                <div class="contentItem"></div>
+                <div class="contentItem" type="3dmodel" path="Toilet" style="background-image: url('/contents/83.png');">
+                
+                </div>
+                
+                <div class="contentItem" type="3dmodel" path="Toilet" style="background-image: url('/contents/83.png');">
+                
+                </div>
+                
+                <div class="contentItem" type="3dmodel" path="Toilet" style="background-image: url('/contents/83.png');">
+                
+                </div>
+                
+                <div class="contentItem" type="3dmodel" path="Toilet" style="background-image: url('/contents/83.png');">
+                
+                </div>
+                
+                <div class="contentItem" type="window" path="" style="background-image: url('/contents/209.png');">
+                
+                </div>
+                
+                <div class="contentItem" type="door" path="" style="background-image: url('/contents/73.png');">
+                
+                </div>
             </div>
 
         </div>
@@ -64,16 +99,69 @@
     class EditorCatalog extends Polymer.Element {
         static get is() { return  'editor-catalog' }
         ready() {
-            super.ready();
-            //this.$.name.textContent = this.tagName;
+            super.ready();            
+            this.addEventListener("mousedown",(e)=>{                                
+                this.selectModel = e.path[0].getAttribute("path");  
+                this.selectType = e.path[0].getAttribute("type"); 
+                console.log(this.selectModel);
+            })            
         }
 
-        onDragStart(){
-            console.log("новый элемент");
-        }
+        getObject(){            
+            if(this.selectModel){
+                return new content[this.selectType] (this.selectModel); //Furniture3dModel (this.selectModel);
+            } else {
+                console.log(content);
+                return new content[this.selectType] (); //Furniture3dModel (this.selectModel);
+            }            
+        }        
     }
     customElements.define(EditorCatalog.is, EditorCatalog);
 </script>
 
 
+<dom-module id="editor-recycled">
+
+    <template>
+        <style>
+            img{
+                position:absolute; 
+                bottom:25px;
+                right:25px;
+                width:100px;
+                height:100px;
+                
+                -webkit-transition: width 0.5s; /* Safari */
+                transition: width 0.5s;
+                -webkit-transition: height 0.5s; /* Safari */
+                transition: height 0.5s;
+            }  
+                        
+            img:hover {                                
+                width:110px;
+                height:110px;
+                
+                -webkit-transition: width 0.5s; /* Safari */
+                transition: width 0.5s;
+                -webkit-transition: height 0.5s; /* Safari */
+                transition: height 0.5s;
+            }
+            
+        </style>
+        <img src ="./ui/2dwidgets/trashcan.png" />
+    </template>
+
+</dom-module>
+
+<script>
+    class Recycled extends Polymer.Element {
+        static get is() { return  'editor-recycled' }
+        ready() {
+            super.ready();            
+            this.dragOut = true;            
+            this.isRecycled = true;
+        }        
+    }
+    customElements.define(Recycled.is, Recycled);
+</script>
 

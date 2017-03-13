@@ -1,8 +1,11 @@
 'use strict';
 
+//АДОВОЕ РЕШЕНИЕ ЧЕРЕЗ ЖОПУ, ЗАМЕНИТЬ НА ГРАФЫ БЫСТРО-СРОЧНО !!!!!!!
+
 class Walls  {
+    
     constructor(scene) {
-        this.scene=scene;
+        this.scene = IoC.inject(AppScene, this);;
         this.items=[];
     }
 
@@ -17,8 +20,7 @@ class Walls  {
         
         item.rootGraph = this;
     }
-
-    //ВНИМАНИЕ Я МОГУ ОПРЕДЕЛЯТЬ КАКОЙ ЭЛЕМЕНТ ИДЁТ ВПЕРЁД ПО КООРДИНАТАМ, ЭТО ИЗБАВИТ ОТ НЕОБХОДИМОСТИ ИСПОЛЬЗОВАТЬ ОТРИЦАТЕЛЬНЫЙ РАЗМЕР
+    
     recalc() {
         for (var i = 1; i < this.items.length - 1; i++) {
             if (this.items[i].horizontal) {
@@ -74,9 +76,9 @@ class Walls  {
         }
     }
 
-    setHWall(wall, xs, xe){
+    setHWall(wall, xs, xe){        
         wall.position.x=xs+((xe-xs)/2);
-        wall.size = (xe-xs);
+        wall.size = (xe-xs);        
     }
 
 
@@ -113,10 +115,18 @@ class Walls  {
 
 
     recalcWallVertical(prev,current,next){
-        var size = next.position.z - prev.position.z;
-        var centerZ = prev.position.z + size/2;
-        current.position.z = centerZ;
-        current.size = size>0? (size -prev.thickness/2-next.thickness/2):(size+prev.thickness/2 + next.thickness/2);;
+        if(current.isBlock){  
+            current.size =  current.size;
+        } else {
+            var startPos = (prev.isBlock)? prev.position.z + prev.size/2 : prev.position.z;
+            var endPos = (next.isBlock)? next.position.z - next.size/2 : next.position.z;
+            
+            var size = endPos- startPos;
+            
+            var centerZ = prev.position.z + size/2;
+            current.position.z = centerZ;
+            current.size = size>0? (size -prev.thickness/2-next.thickness/2):(size+prev.thickness/2 + next.thickness/2);
+        }
     }
 
     //TODO это просто днище! Определится с кучей поворотов box
@@ -214,6 +224,8 @@ class Walls  {
     }
 
     attachBlock(wall, block){
+        this.detachBlock(block);
+        
         var size = wall.size;
 
         if(wall.horizontal) {
@@ -246,21 +258,20 @@ class Walls  {
         block.blockDetach = false;
         this.recalc();
     }
-
-    /*insertBlock(wall){
-
-    }*/
+    
 
     joint(...args){
         for(var item of args){
             item.joints=args;
         }
     }
-
-
     
+    //проверка на наличее
+    has(obj){
+        return this.items.indexOf(obj) > -1;        
+    }
 
-    mark(){
+    /*mark(){
         console.log("mark");
 
         for(var item of this.items){
@@ -274,7 +285,7 @@ class Walls  {
 
         }
     }
-
+    
     renderPoint(x,y,z, color = 0x00ff00){
         var geometry = new THREE.SphereGeometry( 0.4, 32, 32 );
         var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color:  color} ));
@@ -282,6 +293,9 @@ class Walls  {
         mesh.position.z = z;
         mesh.position.y = y;
         this.scene.add( mesh );        
-    }
+    }*/
     
 }
+
+Walls.isSingleton = true;
+IoC.registerClass(Walls);

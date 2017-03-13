@@ -1,17 +1,32 @@
 class Furniture3dModel extends THREE.Group{
-    constructor(){
+    constructor(name){
         super();
+        this.updatePreloader=this.updatePreloader.bind(this);
+        
         this.isFurniture =true;
         this.selectorManager = IoC.inject(SelectorManager);
+        
+        
+        this.showModelPreloader();
+        var loader = new ModelLoader("3dcontent"); //TODO перестать каждый раз создавать прелоадер
+        loader.load(name, (obj)=>{            
+            this.hideModelPreloader();                        
+            this.furnitureModel = obj;
+            this.add(obj);  
+            this.onFinishLoad();
+        });
     }
 
     onFinishLoad(){
-        this.traverse((item)=>{
+        this.furnitureModel.traverse((item)=>{
             item.root = this;
             item.isFurnitureComponent = true;
         })
     }
+    
+    
 
+    
     select(){
         this.selector = this.selectorManager.popSelector(this);
     }
@@ -24,6 +39,28 @@ class Furniture3dModel extends THREE.Group{
     }
 
     onHighlightOff(){
+    }
+
+    //=============================== preloader =======================//
+    showModelPreloader(){
+        var geometry =  new THREE.BoxGeometry( 1, 1, 1 );
+        //var geometryWireframe new THREE.WireframeGeometry( geometry );
+        
+        var material = new THREE.MeshBasicMaterial( { color: 0x22cc22 } );
+        this.preloader = new THREE.Mesh( geometry, material );
+        this.add(this.preloader);   
+        this.updatePreloader();
+    }
+    
+    hideModelPreloader(){
+        clearTimeout(this.preloadUpdater);
+        this.remove(this.preloader);
+    }
+    
+    updatePreloader(){
+        this.rotatePreloader=this.rotatePreloader||0;                
+        this.preloadUpdater = setTimeout(this.updatePreloader,30);
+        this.preloader.rotateY(0.1);
     }
 }
 
@@ -111,5 +148,5 @@ class SelectorManager extends THREE.Group{
 SelectorManager.isSingleton = true;
 IoC.registerClass(SelectorManager);
 
-//TODO �������� DI Framework
-//var SelectorManager=new SelectorManager2();
+var content=content || {};
+content["3dmodel"] = Furniture3dModel;

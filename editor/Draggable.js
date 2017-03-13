@@ -2,7 +2,7 @@ class Dragable extends EventDispatcher{
     constructor(scene){
         super();
         this.scene = scene;
-        this.camera = IoC.inject(MainCamera);//TODO переименовать camera в mainCamera
+        this.camera = IoC.inject(MainCamera);//TODO РїРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ camera РІ mainCamera
 
         //this.camera.currentCamera  = camera;
         this.intersected = null;
@@ -25,14 +25,11 @@ class Dragable extends EventDispatcher{
     }
 
     onMouseDown(e){
-        var HTMLElement = document.elementFromPoint(e.screenX, e.screenY);
-        console.log(HTMLElement);
-        console.log(HTMLElement.tagName);
-
+        var HTMLElement = document.elementFromPoint(e.clientX, e.clientY);
         this.isHTMLDrag =false;
         this.isDraggable = false;
 
-        //если выделили какой-то элемент
+        //РµСЃР»Рё РІС‹РґРµР»РёР»Рё РєР°РєРѕР№-С‚Рѕ СЌР»РµРјРµРЅС‚
         if(HTMLElement.tagName === "EDITOR-CATALOG") {
             this.offset = new THREE.Vector3();
             this.isDraggable = false;
@@ -42,10 +39,10 @@ class Dragable extends EventDispatcher{
             this.HTMLElement = HTMLElement;
 
             document.addEventListener("mousemove", this.onMouseMove);
-            console.log("начали перетаскивание");
+            //console.log("РЅР°С‡Р°Р»Рё РїРµСЂРµС‚Р°СЃРєРёРІР°РЅРёРµ");
         }
 
-        //иначе проверяем клик по экрану
+        //РёРЅР°С‡Рµ РїСЂРѕРІРµСЂСЏРµРј РєР»РёРє РїРѕ СЌРєСЂР°РЅСѓ
         else if(this.intersected){
             this.offset = new THREE.Vector3();
             this.selectObject = this.intersected;
@@ -56,13 +53,19 @@ class Dragable extends EventDispatcher{
         }
     }
 
-    onMouseUp(){
+    onMouseUp(e){
         if(this.isDraggable)
             document.removeEventListener("mousemove", this.onMouseMove);
+        
+        var _HTMLElement = document.elementFromPoint(e.clientX, e.clientY);
+        
+        var HTMLElement = (_HTMLElement.dragOut) ? _HTMLElement: null;                                    
+        //alert(HTMLElement);
 
         this.dispatchEvent({
             type:"dragend",
-            object: this.selectObject
+            object: this.selectObject,
+            HTMLElement: HTMLElement
         })
 
         this.selectObject = null;
@@ -120,8 +123,8 @@ class Dragable extends EventDispatcher{
     }
 
     wallRaycaster(){
-        raycaster.setFromCamera( mouse, this.camera.currentCamera ); //TODO мышь и камера не должны быть глабальными
-        var _objects = scene.children.filter(_=> !_.isHelper );//TODO ФИЛЬТРАЦИЯ ЗЛО, ЛУЧШЕ ЗАВЕСТИ ОБЬЕКТЫ РОДИТЕЛИ ДЛЯ ГРУПП
+        raycaster.setFromCamera( mouse, this.camera.currentCamera ); //TODO РјС‹С€СЊ Рё РєР°РјРµСЂР° РЅРµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РіР»Р°Р±Р°Р»СЊРЅС‹РјРё
+        var _objects = scene.children.filter(_=> !_.isHelper );//TODO Р¤РР›Р¬РўР РђР¦РРЇ Р—Р›Рћ, Р›РЈР§РЁР• Р—РђР’Р•РЎРўР РћР‘Р¬Р•РљРўР« Р РћР”РРўР•Р›Р Р”Р›РЇ Р“Р РЈРџРџ
         return raycaster.intersectObjects( _objects, true);
     }
 
@@ -144,7 +147,7 @@ class Dragable extends EventDispatcher{
                 if(INTERSECTED){
                     INTERSECTED.onHighlightOff();
                 }
-                INTERSECTED=intersects[0].object.root||intersects[0].object.parent; //TODO оставить только ROOT
+                INTERSECTED=intersects[0].object.root||intersects[0].object.parent; //TODO РѕСЃС‚Р°РІРёС‚СЊ С‚РѕР»СЊРєРѕ ROOT
                 INTERSECTED.onHighlightOn();
             }
         } else {

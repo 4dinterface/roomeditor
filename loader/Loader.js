@@ -10,14 +10,13 @@ class ModelLoader{
     }
 
     onError(){
-        this.activeLoadCount--; //âåðîÿòíî íóæíî óìåíüøàòü ñ÷¸ò÷èê â ñëó÷àå çàãðóçêè (ïðîòåñòèòü)
+        this.activeLoadCount--; //Ð²ÐµÑ€Ð¾ÑÑ‚Ð½Ð¾ Ð½ÑƒÐ¶Ð½Ð¾ ÑƒÐ¼ÐµÐ½ÑŒÑˆÐ°Ñ‚ÑŒ ÑÑ‡Ñ‘Ñ‚Ñ‡Ð¸Ðº Ð² ÑÐ»ÑƒÑ‡Ð°Ðµ Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸ (Ð¿Ñ€Ð¾Ñ‚ÐµÑÑ‚Ð¸Ñ‚ÑŒ)
     }
 
     load(name,fn){
         this.loadObj(name,(obj)=>{
-            //TODO äîáàâèòü êåøèðîâàíèå
-            this.applyConfig(obj);
-            obj.onFinishLoad();
+            //TODO Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ ÐºÐµÑˆÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ
+            this.applyConfig(obj);            
             fn(obj);
         })
     }
@@ -34,8 +33,7 @@ class ModelLoader{
             materials.preload();
             var objLoader = new THREE.OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.setPath(path);
-            objLoader.cls = Furniture3dModel;
+            objLoader.setPath(path);            
 
             objLoader.load('Model.obj', (object)=>{
                callback(object);
@@ -46,6 +44,6 @@ class ModelLoader{
 
     applyConfig(obj, config){
         obj.scale.set(0.008,0.008,0.008);
-        obj.position.y=0;
+        //obj.position.y=0;
     }
 }

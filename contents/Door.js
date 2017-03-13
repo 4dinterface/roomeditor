@@ -7,21 +7,23 @@ class DoorBlock extends THREE.Object3D{
         this.thickness =0.5;          // толщина
         this.isBlock = true;          // флаг указывающий что речь о блоке
         this.isWallBlock = true;      // это фрагмент стены
-        this.horizontal = horizontal; // ориентация блока
+        this.horizontal = true; // ориентация блока
         this.rootGraph = null;
+        this.blockDetach = true;
         this.joints=[];
         
-
+        
         //позиция
-        this.position.x = x;
+        this.position.x = 0;
         this.position.y = this.height/2;
-        this.position.z = y;
+        this.position.z = 0;
 
         if(!this.horizontal)
             this.rotation.y=Math.PI/2;
 
         this.generateMesh();
         this.size = 1.2;
+        
     }
 
     generateMesh(){
@@ -37,10 +39,14 @@ class DoorBlock extends THREE.Object3D{
 
 
     set size(value){
+        this._size=value;
+        this.update();
+    }
+    
+    update(){
         this.wallMesh.geometry = this.generateGeometry();
         this.wallMesh.geometry.needsUpdate = true;
-        //this.rule.size = value;
-        this._size=value;
+        //this.rule.size = value;        
         if(!this.horizontal)
             this.rotation.y=Math.PI/2;
     }
@@ -66,3 +72,6 @@ class DoorBlock extends THREE.Object3D{
 
     }
 }
+
+var content = content || {};
+content["door"] = DoorBlock;
