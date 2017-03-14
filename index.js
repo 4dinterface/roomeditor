@@ -75,9 +75,7 @@ class App {
 
         //scene
         var selectorManager = IoC.inject(SelectorManager);
-        scene.add(selectorManager);
-
-        
+        scene.add(selectorManager);        
         
         var model = new Furniture3dModel();
         scene.add(model);
@@ -91,13 +89,34 @@ class App {
         scene.add(graph);
         
         var wall1 = new Wall(0,0,false, camera2);
-        graph.add(wall1, null, 10,10);
+        graph.add(wall1, null, 0, 10);
         
-        var wall2 = new Wall(0,0,false, camera2);
-        graph.add(wall2, wall1, 10, 20);
         
-        var window2 = new WindowBlock(0, 0, true, camera2);
-        graph.add(window2, wall2, 10, 24);
+        var wall2_1 = new Wall(0, 0, false, camera2);
+        graph.add(wall2_1, wall1, 8, 10);
+        
+        var wall2_2 = new DoorBlock(0, 0, false, camera2);
+        graph.add(wall2_2, wall2_1, 12, 10);
+        
+        var wall2_3 = new Wall(0, 0, false, camera2);
+        graph.add(wall2_3, wall2_2, 20, 10);
+        
+        
+        var wall3 = new Wall(0, 0, false, camera2);
+        graph.add(wall3, wall2_3, 20, 0);
+        
+        
+        
+        var wall4 = new Wall(0, 0, false, camera2);
+        graph.add(wall4, wall3, 0, 0);
+        
+        
+        graph.setParent(wall1, wall4);
+        graph.recalcWall(wall4);
+        graph.recalcWall(wall1);
+        
+        //var window2 = new WindowBlock(0, 0, true, camera2);
+        //graph.add(window2, wall2, 10, 24);
 
         //==========================================================//
 

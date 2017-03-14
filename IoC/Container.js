@@ -9,7 +9,7 @@ class IoCContainer{
 
     //регистрируем уже существующий экземпляр синглетона
     registerSingletonInstance(id, instance){
-        console.log("Записываю instance", id);
+        //console.log("Записываю instance", id);
         this.singletonInstances.set(id, instance);
         //this.resolve();
     }
@@ -32,7 +32,7 @@ class IoCContainer{
         //если нет класса то создадим новый экземпляр
         else if(this.classes.has(cls)){
             var instance = new (this.classes.get( cls )) ( );
-            console.log("создаю экземпляр",cls);
+            //console.log("создаю экземпляр",cls);
 
             //перенести в сам класс
             if(cls.isSingleton) {

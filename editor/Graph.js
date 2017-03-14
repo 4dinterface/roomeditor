@@ -3,7 +3,7 @@ class Graph extends THREE.Group {
     constructor(scene) {
         super();
         this.scene = IoC.inject(AppScene, this);;
-        this.items=[];
+        this.items=[];        
     }
     
     //добавляемый элемент, родитель, позиция    
@@ -11,10 +11,13 @@ class Graph extends THREE.Group {
         //this.items.push(item);                                          
         item.rootGraph = this;        
         
+        
         item.point = new THREE.Vector3(x, 0 ,y);
         if(parent){
             this.setParent(item, parent);         
         }
+        item.defaultQuanternion=new THREE.Quaternion();
+        item.defaultQuanternion.copy(item.quaternion);         
         
         super.add(item);        
         this.recalcWall(item);        
@@ -26,31 +29,79 @@ class Graph extends THREE.Group {
         
         //но выходить из него может точек много
         parent.nodeOut = item.linkOut || [];
-        parent.nodeOut.push(item);                
+        parent.nodeOut.push(item);            
+    }
+    
+    translateBlock(block, offset){                
+        if(block.nodeIn)
+            block.nodeIn.point.add(offset);
+        
+        block.point.add(offset);    
+        
+        this.recalcWall( block.nodeIn );
+        this.recalcWall( block );
+        for(var item of block.nodeOut){
+            console.log("recalc", item);
+            this.recalcWall(item);
+        }
+    }
+    
+    translateSelectLine(items, offset){
+        var needUpdate=[]; //TODO заменить на set
+        var specUpdate=[]; //TODO заменить на set
+        console.log(items);        
+        for(var item of items){            
+            
+            if(needUpdate.indexOf(item)<0){
+                
+                for(var node of item.nodeOut){
+                    if(specUpdate.indexOf(node)<0)
+                        specUpdate.push(node);
+                }
+                
+                item.point.add(offset);
+                needUpdate.push(item);                                 
+            }
+                                 
+            //this.recalcWall(item);                        
+            if(item.nodeIn){
+                if(needUpdate.indexOf(item.nodeIn)<0){
+                    item.nodeIn.point.add(offset);                
+                    needUpdate.push(item.nodeIn)                                                                 
+                }
+            }                                         
+        }    
+        
+                    
+        
+        for(var item of needUpdate){
+            this.recalcWall(item);
+        }
+        
+        for(var item of specUpdate){
+            this.recalcWall(item);
+        }
+        
     }
     
     recalcWall(item){
         var nodeIn = item.nodeIn;        
         var inPoint = nodeIn ? nodeIn.point : new THREE.Vector3(0, 0, 0);
         
-        var direction =(new THREE.Vector3(item.point.x, item.point.y, item.point.z)).sub(inPoint);
-                        
-        var center = new THREE.Vector3(direction.x/2, 0, direction.z/2);
-        
+        //найдёи позицию
+        var direction =(new THREE.Vector3(item.point.x, item.point.y, item.point.z)).sub(inPoint);                                
+        var center = new THREE.Vector3(direction.x/2, 0, direction.z/2);        
         var pos = (new THREE.Vector3(inPoint.x, inPoint.y, inPoint.z)).add(center);              
         item.position.set(pos.x,pos.y,pos.z);
                 
-        var size = new THREE.Vector3(0,0,0).distanceTo(direction);
-        item.size=size;
-        
-        var angle = Math.atan2(direction.x, direction.z);
-        item.rotateY(angle);        
-        
-        console.log("GraphCalc = ", direction);
+        //установим размер
+        item.size = new THREE.Vector3(0,0,0).distanceTo(direction);                
                 
-        this.renderPoint(inPoint.x,inPoint.y,inPoint.z);
-        this.renderPoint(item.point.x,item.point.y,item.point.z);
-    }  
+        //повернём обьект
+        var angle = Math.atan2(direction.x, direction.z);
+        item.quaternion.copy(item.defaultQuanternion);                
+        item.rotateY(angle);                                   
+    }
     
     renderPoint(x,y,z, color = 0x00ff00){
         var geometry = new THREE.SphereGeometry( 1.4, 32, 32 );
@@ -58,8 +109,28 @@ class Graph extends THREE.Group {
         mesh.position.x = x;
         mesh.position.y = y;
         mesh.position.z = z;        
-        this.scene.add( mesh );        
+        this.scene.add( mesh );    
+        return mesh;
     }
+    
+    
+    getLine(block, blocks){
+        var isDontDeffered = (item)=> item.rotation.y === block.rotation.y && item.rotation.x === block.rotation.x && item.rotation.z === block.rotation.z;
+        
+        var result = blocks || [];
+        result.push( block );
+        
+        for(var item of block.nodeOut){
+            if(result.indexOf(item)<0 && isDontDeffered(item) )
+                this.getLine(item, result);        
+        }
+    
+        if( block.nodeIn && result.indexOf(block.nodeIn)<0 && isDontDeffered(block.nodeIn))
+            this.getLine(block.nodeIn, result);
+        
+        return result;
+    }
+        
 };
 
 

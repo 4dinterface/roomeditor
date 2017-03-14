@@ -25,7 +25,7 @@ class WindowBlock extends THREE.Object3D{
         this.size = 2;
     }
 
-
+    
     generateMesh(){
         //geometry
         var geometry = this.generateGeometry();

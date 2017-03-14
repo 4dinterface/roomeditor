@@ -12,14 +12,20 @@ class DoorBlock extends THREE.Object3D{
         this.blockDetach = true;
         this.joints=[];
         
+        this.nodeIn = null;
+        this.nodeOut = [];
+        this.point = new THREE.Vector3(0,0,0);
+        
+        this.defaultQuanternion = new THREE.Quaternion();
+        this.defaultQuanternion.copy(this.quaternion);
         
         //позиция
         this.position.x = 0;
         this.position.y = this.height/2;
         this.position.z = 0;
 
-        if(!this.horizontal)
-            this.rotation.y=Math.PI/2;
+        /*if(!this.horizontal)
+            this.rotation.y=Math.PI/2;*/
 
         this.generateMesh();
         this.size = 1.2;
@@ -34,7 +40,7 @@ class DoorBlock extends THREE.Object3D{
     }
     
     generateGeometry(){
-        return new THREE.BoxBufferGeometry( Math.abs(this.size), this.height, 0.2 );
+        return new THREE.BoxBufferGeometry( 0.2, this.height, Math.abs(this.size) );
     }
 
 
@@ -47,8 +53,8 @@ class DoorBlock extends THREE.Object3D{
         this.wallMesh.geometry = this.generateGeometry();
         this.wallMesh.geometry.needsUpdate = true;
         //this.rule.size = value;        
-        if(!this.horizontal)
-            this.rotation.y=Math.PI/2;
+        /*if(!this.horizontal)
+            this.rotation.y=Math.PI/2;*/
     }
 
     get size(){

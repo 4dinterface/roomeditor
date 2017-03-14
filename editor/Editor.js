@@ -12,6 +12,7 @@ class Editor{
 
         this.orbitControls = new THREE.OrbitControls( this.camera );
         this.selectorManager = IoC.inject(SelectorManager, this);
+        this.graph = IoC.inject(Graph, this);
 
         //перетаскивание
         this.dragable = new Dragable(this.scene, this.camera);
@@ -48,10 +49,12 @@ class Editor{
 
     onDragStart(e){
         this.orbitControls.enabled = false;
+        
         if(e.isHTMLDrag && e.HTMLElement.getObject) {                        
             var model = e.HTMLElement.getObject();// new Furniture3dModel();
             model.position.set(e.position.x, model.position.y, e.position.z);
             this.scene.add(model);            
+            this.selectLine = [model];
             
             this.dragable.setSelectObject(model); // установим обьект который перетаскиваем      
             //model.select();                       // выделим обьект            
@@ -59,7 +62,11 @@ class Editor{
             this.setSelect(e.object);
         } else if(e.object.isUI){
             e.object.onDragStart(e);
+        } if(e.object){            
+            this.selectLine=this.graph.getLine(e.object)            
+            console.log(this.selectLine);
         }
+        
         this.attachBlockPos = e.position;
     }
 
@@ -67,24 +74,34 @@ class Editor{
         this.orbitControls.enabled = true;
         if(e.HTMLElement && e.HTMLElement.isRecycled){
             this.scene.remove(e.object);
-        }                
+        }     
+        this.selectLine = [];
     }
 
     onDrag(e){
+        
         this.orbitControls.enabled = false;
         if(e.isHTMLDrag) {
+            
             //console.log("htmldrag");
         } else if(e.object.isFurniture){
             this.dragFurniture(e);
         }  else if(e.object.isUI) {
             e.object.onDrag(e);
-        }else {
-            this.dragWall(e);
+        }else {                        
+            this.dragWall(this.selectLine, e);
         }
+    }
+    
+    dragWall(line, e){
+        //console.log("!!!!!!!!!!!!!!!!!!!!", e.object);        
+        //this.graph.translateBlock(e.object, e.offset);
+        console.log(e.offset);
+        this.graph.translateSelectLine(line, e.offset);
     }
 
     //перетаскивание,
-    dragWall(e){
+    /*dragWall(e){
         //присоединение к горизонтальной стене
         if(e.backSelect && e.object.blockDetach && e.backSelect.horizontal){                        
             this.walls.attachBlock(e.backSelect, e.object);            
@@ -122,7 +139,7 @@ class Editor{
         } else {
             this.walls.translateWall(e.object, e.offset);
         }
-    }
+    }*/
 
     dragFurniture(e){
         e.object.position.x= e.position.x;
