@@ -30,6 +30,8 @@ class DoorBlock extends THREE.Object3D{
         this.generateMesh();
         this.size = 1.2;
         
+        this.detach = true;
+        
     }
 
     generateMesh(){

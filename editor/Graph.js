@@ -3,41 +3,63 @@ class Graph extends THREE.Group {
     constructor(scene) {
         super();
         this.scene = IoC.inject(AppScene, this);;
-        this.items=[];        
+        this.items=[];                
     }
     
     //добавляемый элемент, родитель, позиция    
     add(item, parent, x, y) {
-        //this.items.push(item);                                          
-        item.rootGraph = this;        
+        //this.items.push(item);  
+        
+        item.rootGraph = this;     
+        item.detach = false;
         
         
         item.point = new THREE.Vector3(x, 0 ,y);
         if(parent){
             this.setParent(item, parent);         
         }
+
         item.defaultQuanternion=new THREE.Quaternion();
-        item.defaultQuanternion.copy(item.quaternion);         
-        
+        item.defaultQuanternion.copy(item.quaternion);                 
         super.add(item);        
         this.recalcWall(item);        
+           
     }
 
     insert(wall, obj){
+        console.log("insert", obj.detach);        
+        obj.detach = false;        
+        
         var wall2 = new Wall(0, 0, false, null);
-
-        obj.point = new THREE.Vector3(obj.position.x, 0 ,obj.position.z);
-        obj.nodeOut = [...wall.nodeOut];// копируем исходящие связи
-        obj.nodeIn = wall;
+        wall2.point.copy(wall.point);
+        super.add(wall2);
+        
+        obj.point = new THREE.Vector3(obj.position.x, 0 ,obj.position.z);        
+        wall.point = new THREE.Vector3(obj.position.x, 0 ,obj.position.z);
+                
+        wall2.nodeOut = [...wall.nodeOut];        
         wall.nodeOut=[obj];
-        for (var node of obj.nodeOut){
-            node.nodeIn = obj;
-        }
-        graph.add(wall2, obj, 8, 10);
+        obj.nodeIn = wall;
+        obj.nodeOut = [wall2];// копируем исходящие связи        
+        
+        
+        for (var node of wall2.nodeOut){
+            node.nodeIn = wall2;
+        }         
+        
+        console.log(wall);
+        
+        this.recalcWall(wall);  
+        this.recalcWall(obj);   
+        this.recalcWall(wall2);  
+        
+        
+        
     }
 
     remove(item){
         var nodeIn =  item.nodeIn;
+        item.detach = true;
 
         for (var node of item.nodeOut){
             node.nodeIn = nodeIn;
@@ -54,7 +76,7 @@ class Graph extends THREE.Group {
         if(nodeIn.nodeOut.length==1 && !nodeIn.isBlock && !nodeIn.nodeOut[0].isBlock ){
             var nodeOut = nodeIn.nodeOut[0];
             this.remove( nodeIn );
-            this.recalcWall(nodeOut);
+            this.recalcWall( nodeOut );
             console.log("возможно обьединение");
         }
     }
@@ -85,7 +107,7 @@ class Graph extends THREE.Group {
     translateSelectLine(items, offset){
         var needUpdate=[]; //TODO заменить на set
         var specUpdate=[]; //TODO заменить на set
-        console.log(items);        
+        //console.log(items);        
         for(var item of items){            
             
             if(needUpdate.indexOf(item)<0){

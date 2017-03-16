@@ -54,8 +54,7 @@ class Editor{
             var model = e.HTMLElement.getObject();// new Furniture3dModel();
             model.position.set(e.position.x, model.position.y, e.position.z);
             this.scene.add(model);            
-            this.selectLine = [model];
-            
+            this.selectLine = [model];            
             this.dragable.setSelectObject(model); // установим обьект который перетаскиваем      
             //model.select();                       // выделим обьект            
         } else if(e.object.isFurniture && !this.isSelected(e.object)){
@@ -66,6 +65,7 @@ class Editor{
             console.log(e.object);
             this.graph.remove(e.object);
             this.scene.add(e.object);
+            
         } else if(e.object){
             this.selectLine=this.graph.getLine(e.object)            
             console.log(this.selectLine);
@@ -92,10 +92,14 @@ class Editor{
             this.dragFurniture(e);
         }  else if(e.object.isUI) {
             e.object.onDrag(e);
-        }else if(e.object.isBlock) {
-            e.object.position.add(e.offset);
-            console.log("e.object.isBlock");
-
+        } else if(e.object.isBlock) {            
+            
+            if(e.backSelect && e.object.detach) {                
+                this.graph.insert(e.backSelect, e.object ,e.position.x, e.position.z);                                
+            } else {                        
+                e.object.position.add(e.offset);                                    
+            }
+            
         } else{
             this.dragWall(this.selectLine, e);
         }
@@ -103,8 +107,7 @@ class Editor{
     
     dragWall(line, e){
         //console.log("!!!!!!!!!!!!!!!!!!!!", e.object);        
-        //this.graph.translateBlock(e.object, e.offset);
-        console.log(e.offset);
+        //this.graph.translateBlock(e.object, e.offset);        
         this.graph.translateSelectLine(line, e.offset);
     }
 

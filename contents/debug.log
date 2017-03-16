@@ -1,0 +1,4 @@
+[0316/180929.234:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0316/180929.379:ERROR:crashpad_client_win.cc(652)] not connected
+[0316/181221.711:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0316/181221.857:ERROR:crashpad_client_win.cc(652)] not connected

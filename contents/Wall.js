@@ -11,6 +11,10 @@ class Wall extends THREE.Object3D{
         this.rootGraph = null;
         this.joints=[];
         //this._size = 2;
+        
+        this.point = new THREE.Vector3();
+        this.defaultQuanternion = new THREE.Quaternion();
+        this.defaultQuanternion.copy(this.quaternion);     
 
         //позиция
         this.position.x = x;
