@@ -22,13 +22,49 @@ class Graph extends THREE.Group {
         super.add(item);        
         this.recalcWall(item);        
     }
+
+    insert(wall, obj){
+        var wall2 = new Wall(0, 0, false, null);
+
+        obj.point = new THREE.Vector3(obj.position.x, 0 ,obj.position.z);
+        obj.nodeOut = [...wall.nodeOut];// копируем исходящие связи
+        obj.nodeIn = wall;
+        wall.nodeOut=[obj];
+        for (var node of obj.nodeOut){
+            node.nodeIn = obj;
+        }
+        graph.add(wall2, obj, 8, 10);
+    }
+
+    remove(item){
+        var nodeIn =  item.nodeIn;
+
+        for (var node of item.nodeOut){
+            node.nodeIn = nodeIn;
+            nodeIn.nodeOut.push(node);
+        }
+
+        item.rootGraph = null;
+        nodeIn.nodeOut.splice( nodeIn.nodeOut.indexOf[item], 1 );
+        item.nodeOut = [];
+
+        super.remove(item);
+
+        //попробуем обьеденить стены
+        if(nodeIn.nodeOut.length==1 && !nodeIn.isBlock && !nodeIn.nodeOut[0].isBlock ){
+            var nodeOut = nodeIn.nodeOut[0];
+            this.remove( nodeIn );
+            this.recalcWall(nodeOut);
+            console.log("возможно обьединение");
+        }
+    }
     
     setParent(item, parent){
         //начинается всегда из одной точки        
         item.nodeIn = parent; 
         
         //но выходить из него может точек много
-        parent.nodeOut = item.linkOut || [];
+        parent.nodeOut = item.nodeOut || [];
         parent.nodeOut.push(item);            
     }
     
@@ -112,6 +148,13 @@ class Graph extends THREE.Group {
         this.scene.add( mesh );    
         return mesh;
     }
+
+    isDontDeffered(a,b){
+        return a.rotation.y === b.rotation.y &&
+             a.rotation.x === b.rotation.x &&
+             a.rotation.z === b.rotation.z &&
+            !a.isBlock && !b.isBlock;
+    }
     
     
     getLine(block, blocks){
@@ -130,6 +173,7 @@ class Graph extends THREE.Group {
         
         return result;
     }
+
         
 };
 

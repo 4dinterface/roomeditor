@@ -62,7 +62,11 @@ class Editor{
             this.setSelect(e.object);
         } else if(e.object.isUI){
             e.object.onDragStart(e);
-        } if(e.object){            
+        } else if( e.object && e.object.isBlock && !e.object.detach){
+            console.log(e.object);
+            this.graph.remove(e.object);
+            this.scene.add(e.object);
+        } else if(e.object){
             this.selectLine=this.graph.getLine(e.object)            
             console.log(this.selectLine);
         }
@@ -88,7 +92,11 @@ class Editor{
             this.dragFurniture(e);
         }  else if(e.object.isUI) {
             e.object.onDrag(e);
-        }else {                        
+        }else if(e.object.isBlock) {
+            e.object.position.add(e.offset);
+            console.log("e.object.isBlock");
+
+        } else{
             this.dragWall(this.selectLine, e);
         }
     }

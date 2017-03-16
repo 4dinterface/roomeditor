@@ -1,6 +1,6 @@
 "use strict";
 
-class IoCContainer{
+class IoCContainerClass {
 
     constructor(){
         this.singletonInstances = new Map();
@@ -11,7 +11,6 @@ class IoCContainer{
     registerSingletonInstance(id, instance){
         //console.log("Записываю instance", id);
         this.singletonInstances.set(id, instance);
-        //this.resolve();
     }
 
     //регистрируем класс в контейнере
@@ -46,10 +45,15 @@ class IoCContainer{
     }
 }
 
-window.IoC = new IoCContainer();
+window.IoC = new IoCContainerClass();
 
+/*function IoCContainer(){
+    function(){
+
+    }
+}
 function singleton(){
     return function singleton(cls){
         cls.isSingleton = true;
     }
-}
+}*/
