@@ -2,3 +2,25 @@
 [0316/180929.379:ERROR:crashpad_client_win.cc(652)] not connected
 [0316/181221.711:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
 [0316/181221.857:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051556.490:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051556.930:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051557.027:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051557.158:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051557.256:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051557.390:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051557.483:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051557.612:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051557.710:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051557.840:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051557.935:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051558.065:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051558.162:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051558.294:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051558.388:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051558.523:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051558.618:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051558.750:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051558.877:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051559.010:ERROR:crashpad_client_win.cc(652)] not connected
+[0317/051559.106:ERROR:registration_protocol_win.cc(56)] CreateFile: Не удается найти указанный файл. (0x2)
+[0317/051559.240:ERROR:crashpad_client_win.cc(652)] not connected

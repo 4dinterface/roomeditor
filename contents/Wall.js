@@ -21,7 +21,7 @@ class Wall extends THREE.Object3D{
         this.position.y = this.height/2;
         this.position.z = y;
 
-        this.applyRotate();
+        //this.applyRotate();
 
         this.generateMesh();
         this.generateHelpers(camera);
@@ -85,12 +85,11 @@ class Wall extends THREE.Object3D{
         
         if(this.rule)
             this.rule.size = value;
-
         
-        this.applyRotate();
+        //this.applyRotate();
     }
 
-    applyRotate(){
+    /*applyRotate(){
         if(this.size > 0 ){
             if(this.horizontal)
                 this.rotation.y=Math.PI;
@@ -98,7 +97,7 @@ class Wall extends THREE.Object3D{
             if(!this.horizontal)
                 this.rotation.y=Math.PI/2;
         }
-    }
+    }*/
 
     get size(){
         return this._size;

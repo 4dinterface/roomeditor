@@ -19,45 +19,61 @@ class Graph extends THREE.Group {
             this.setParent(item, parent);         
         }
 
-        item.defaultQuanternion=new THREE.Quaternion();
-        item.defaultQuanternion.copy(item.quaternion);                 
+        //item.defaultQuanternion=new THREE.Quaternion();
+        //item.defaultQuanternion.copy(item.quaternion);
         super.add(item);        
         this.recalcWall(item);        
            
     }
 
     insert(wall, obj){
-        console.log("insert", obj.detach);        
+
+        //TODO перестать отправлять сюда хелперы
+        if(!wall.point)
+            return;
+
+        console.log("insert", obj.detach);
+        var finalPoint = new THREE.Vector3(wall.point.x, wall.point.y, wall.point.z);
+
         obj.detach = false;        
         
         var wall2 = new Wall(0, 0, false, null);
-        wall2.point.copy(wall.point);
+        console.log(wall);
+        wall2.point.set(finalPoint.x, finalPoint.y, finalPoint.z);
+        wall2.IDDD="WALL2";
         super.add(wall2);
         
         obj.point = new THREE.Vector3(obj.position.x, 0 ,obj.position.z);        
-        wall.point = new THREE.Vector3(obj.position.x, 0 ,obj.position.z);
+        wall.point = new THREE.Vector3(obj.position.x-3, 0 ,obj.position.z);
+        wall.IDDD="WALL1";
                 
-        wall2.nodeOut = [...wall.nodeOut];        
-        wall.nodeOut=[obj];
+        //wall2.nodeOut = [...wall.nodeOut];
+        wall2.nodeOut = [];
+        wall2.nodeIn = obj;
         obj.nodeIn = wall;
-        obj.nodeOut = [wall2];// копируем исходящие связи        
+        obj.nodeOut = [wall2];// копируем исходящие связи
         
-        
-        for (var node of wall2.nodeOut){
+
+        //тут что-то не так :)
+        /*for (var node of wall.nodeOut){
+            wall2.nodeOut.push(node)
             node.nodeIn = wall2;
-        }         
+        }*/
+        wall.nodeOut=[obj];
+
+
         
-        console.log(wall);
-        
+        console.log("изучи меня", obj);
+
+
         this.recalcWall(wall);  
-        this.recalcWall(obj);   
-        this.recalcWall(wall2);  
-        
-        
-        
+        this.recalcWall(obj);
+        this.recalcWall(wall2, true);
     }
 
     remove(item){
+        return;
+        console.log("remove", item);
         var nodeIn =  item.nodeIn;
         item.detach = true;
 
@@ -79,6 +95,7 @@ class Graph extends THREE.Group {
             this.recalcWall( nodeOut );
             console.log("возможно обьединение");
         }
+        console.log("remove  end");
     }
     
     setParent(item, parent){
@@ -142,23 +159,34 @@ class Graph extends THREE.Group {
         
     }
     
-    recalcWall(item){
+    recalcWall(item, debug){
         var nodeIn = item.nodeIn;        
         var inPoint = nodeIn ? nodeIn.point : new THREE.Vector3(0, 0, 0);
+
         
         //найдёи позицию
-        var direction =(new THREE.Vector3(item.point.x, item.point.y, item.point.z)).sub(inPoint);                                
+        //console.log(inPoint, nodeIn);
+
+        var direction =(new THREE.Vector3(item.point.x, item.point.y, item.point.z)).sub(inPoint);
+        //var direction =(new THREE.Vector3(inPoint.x, inPoint.y, inPoint.z)).sub(item.point);
+
         var center = new THREE.Vector3(direction.x/2, 0, direction.z/2);        
-        var pos = (new THREE.Vector3(inPoint.x, inPoint.y, inPoint.z)).add(center);              
+        var pos = (new THREE.Vector3(inPoint.x, inPoint.y, inPoint.z)).add(center);
+
         item.position.set(pos.x,pos.y,pos.z);
-                
+        if(debug){
+            this.renderPoint(inPoint.x,inPoint.y,inPoint.z, 0xFF0000);
+            this.renderPoint(item.point.x, item.point.y, item.point.z, 0x0000FF);
+        }
         //установим размер
         item.size = new THREE.Vector3(0,0,0).distanceTo(direction);                
                 
         //повернём обьект
+
         var angle = Math.atan2(direction.x, direction.z);
-        item.quaternion.copy(item.defaultQuanternion);                
-        item.rotateY(angle);                                   
+        item.quaternion.copy(item.defaultQuanternion);
+        item.rotateY(angle+Math.PI/2); //Можно растягивать обьекты по другой оси, а не корректировать угол
+
     }
     
     renderPoint(x,y,z, color = 0x00ff00){

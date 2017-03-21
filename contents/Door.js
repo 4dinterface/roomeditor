@@ -42,7 +42,7 @@ class DoorBlock extends THREE.Object3D{
     }
     
     generateGeometry(){
-        return new THREE.BoxBufferGeometry( 0.2, this.height, Math.abs(this.size) );
+        return new THREE.BoxBufferGeometry( Math.abs(this.size), this.height, 0.2 );
     }
 
 
