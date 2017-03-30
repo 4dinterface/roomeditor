@@ -4,8 +4,9 @@ class Rule extends THREE.Object3D{
     constructor(camera){
         super();
         this.camera = camera;
-        this._size=0;               
-        
+        this._size=0;
+        this.info="";
+
         this.rule = this.renderLine(0,0,0,  2, 0.2,  0.2);
         this.line1 = this.renderLine(0, -0.75, 0,  0.05, 1.5,  0.05);
         this.line2 = this.renderLine(0,-0.75,  0,  0.05, 1.5,  0.05);
@@ -77,7 +78,9 @@ class Rule extends THREE.Object3D{
             this._size=value;            
 
             value = Math.abs(value).toString().substr(0,4);
-            this.updateRenderText(value);
+            //this.updateRenderText(value +" "+this._info );
+
+            this.updateRenderText(this.info + " " + value);
         }
     }
 }

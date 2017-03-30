@@ -26,49 +26,46 @@ class Graph extends THREE.Group {
            
     }
 
-    insert(wall, obj){
+    //обьединение
+    //вх -> A->B-> вых
+    chain(a, b){
+        b.nodeIn = a.nodeIn;
+        b.nodeOut = [a]; //a  передаёт все исходящие элементы b
+        a.nodeIn = b;
+        var out = b.nodeIn.nodeOut;
+        out[out.indexOf(a)] = b;
+    }
 
+    insert(wall, obj){
         //TODO перестать отправлять сюда хелперы
         if(!wall.point)
             return;
+        obj.detach = false;
 
-        console.log("insert", obj.detach);
-        var finalPoint = new THREE.Vector3(wall.point.x, wall.point.y, wall.point.z);
+        //console.log("insert", obj.detach);
+        //wall.IDDD="W1 ";
+        //wall2.IDDD="W2 ";
 
-        obj.detach = false;        
-        
+        //создаём новую стену
         var wall2 = new Wall(0, 0, false, null);
-        console.log(wall);
-        wall2.point.set(finalPoint.x, finalPoint.y, finalPoint.z);
-        wall2.IDDD="WALL2";
         super.add(wall2);
-        
-        obj.point = new THREE.Vector3(obj.position.x, 0 ,obj.position.z);        
-        wall.point = new THREE.Vector3(obj.position.x-3, 0 ,obj.position.z);
-        wall.IDDD="WALL1";
-                
-        //wall2.nodeOut = [...wall.nodeOut];
-        wall2.nodeOut = [];
-        wall2.nodeIn = obj;
-        obj.nodeIn = wall;
-        obj.nodeOut = [wall2];// копируем исходящие связи
-        
 
-        //тут что-то не так :)
-        /*for (var node of wall.nodeOut){
-            wall2.nodeOut.push(node)
-            node.nodeIn = wall2;
-        }*/
-        wall.nodeOut=[obj];
+        //создаём цепочки
+        this.chain(wall, obj);
+        this.chain(obj, wall2);
 
+        //считаем координаты
+        var finalPoint = new THREE.Vector3(wall.point.x, 0, wall.point.z);
+        var direction = new THREE.Vector3(0,0,0).copy(finalPoint).sub(wall2.nodeIn.point).normalize()
+        var sizeVector = new THREE.Vector3(0,0,0).copy(direction).multiplyScalar(obj.size/2)
 
-        
-        console.log("изучи меня", obj);
+        wall.point.set(finalPoint.x, 0, finalPoint.z);
+        obj.point.set(obj.position.x+sizeVector.x, 0 ,obj.position.z+sizeVector.z) //TODO- учесть size
+        wall2.point.set(obj.position.x-sizeVector.x, 0 ,obj.position.z-sizeVector.z);
 
-
-        this.recalcWall(wall);  
+        this.recalcWall(wall2);
+        this.recalcWall(wall);
         this.recalcWall(obj);
-        this.recalcWall(wall2, true);
     }
 
     remove(item){
@@ -156,7 +153,6 @@ class Graph extends THREE.Group {
         for(var item of specUpdate){
             this.recalcWall(item);
         }
-        
     }
     
     recalcWall(item, debug){
@@ -171,7 +167,7 @@ class Graph extends THREE.Group {
         //var direction =(new THREE.Vector3(inPoint.x, inPoint.y, inPoint.z)).sub(item.point);
 
         var center = new THREE.Vector3(direction.x/2, 0, direction.z/2);        
-        var pos = (new THREE.Vector3(inPoint.x, inPoint.y, inPoint.z)).add(center);
+        var pos = (new THREE.Vector3(inPoint.x, item.height/2, inPoint.z)).add(center);
 
         item.position.set(pos.x,pos.y,pos.z);
         if(debug){
@@ -188,6 +184,8 @@ class Graph extends THREE.Group {
         item.rotateY(angle+Math.PI/2); //Можно растягивать обьекты по другой оси, а не корректировать угол
 
     }
+
+
     
     renderPoint(x,y,z, color = 0x00ff00){
         var geometry = new THREE.SphereGeometry( 1.4, 32, 32 );

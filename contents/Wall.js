@@ -83,8 +83,11 @@ class Wall extends THREE.Object3D{
             this.prevBox.position.x = -(Math.abs(this.size/2)+this.thickness/2);
         }
         
-        if(this.rule)
+        if(this.rule) {
             this.rule.size = value;
+            this.rule.info = this.IDDD;
+        }
+
         
         //this.applyRotate();
     }
